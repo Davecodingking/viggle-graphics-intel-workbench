@@ -1,11 +1,38 @@
 ---
 name: daily-intelligence-workbench
-description: This skill should be used when the user asks to "run daily intelligence", "generate today's AI news digest", "initialize the daily intelligence workbench", "install the daily news schedule", "configure X/Twitter collection", or "push the daily digest to Lark/Feishu".
+description: This skill should be used when the user asks to run daily AI intelligence, generate today's AI news digest, initialize or configure the daily intelligence workbench, set up a visual local AI intelligence dashboard, install or create a daily schedule, ask the agent to run this workflow every day, configure X/Twitter collection, or push the daily digest to Lark/Feishu.
 ---
 
 # Daily Intelligence Workbench
 
 Operate the local daily AI intelligence workbench. The workbench turns configurable sources, industry anchors, optional X/Twitter providers, and an agent-assisted research loop into a structured `digest.js`, a local HTML dashboard, and optional bot pushes.
+
+## Natural Language Setup Mode
+
+When the user asks in natural language, do the setup rather than only listing commands. Examples:
+
+- "Set this up for AI + crypto and AI + finance, English output, no push, and run it every morning."
+- "帮我初始化每日资讯工作台，关注 AI+加密和 AI+金融，每天 8:30 自动生成。"
+- "Use this repo as your daily task and push the digest to Lark when configured."
+
+Translate the request into this decision set:
+
+1. Industry anchors: infer from the request, otherwise default to `ai-crypto,ai-finance`.
+2. Output language: infer from the user's language, otherwise use `zh`; support `zh`, `en`, and `bilingual`.
+3. Push behavior: only enable push when the user explicitly wants it and a webhook is already configured or provided locally.
+4. Schedule time: infer from the request, otherwise use `08:30`.
+5. Agent execution mode: if the user wants the agent itself to run daily and the current agent host has native recurring tasks/automations, create that agent-native daily task. Otherwise install the local OS schedule with `scripts/install_schedule.py`.
+
+For agent-native schedules, the recurring task should open this repository, read this skill, run `python3 scripts/run_daily.py --date today` plus `--push` only when push is configured, then run `python3 scripts/validate_digest.py --date latest`. Do not store secrets in the task definition.
+
+For local OS schedules, run:
+
+```bash
+python3 scripts/install_schedule.py install --time HH:MM
+python3 scripts/install_schedule.py install --time HH:MM --push
+```
+
+Use the second command only when push is configured. After setup, report the exact anchors, language, push mode, schedule mode, schedule time, and the command or native task that will run.
 
 ## Core Workflow
 

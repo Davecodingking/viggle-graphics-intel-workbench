@@ -11,6 +11,16 @@
 - `python3 scripts/install_schedule.py install --time 08:30 --push`：安装本地每日定时任务。
 - `python3 scripts/validate_digest.py --date latest`：校验 digest 与 manifest。
 
+## 自然语言入口
+
+用户可能不会直接给 Python 命令，而是说：
+
+- “帮我初始化每日资讯工作台，关注 AI+加密和 AI+金融，每天 08:30 自动生成。”
+- “输出英文，不推送，先每天早上更新本地看板。”
+- “如果有飞书 webhook 就推送，否则只生成 digest。”
+
+遇到这类请求时，不要只解释命令；先读取 `skills/daily-intelligence-workbench/SKILL.md`，按其中 Natural Language Setup Mode 自动推断或使用默认值，然后执行初始化、语言配置、推送配置和定时任务设置。若当前 Agent 平台支持自己的 recurring task / automation，优先按用户要求创建 agent 原生每日任务；否则使用 `scripts/install_schedule.py` 安装本地 launchd / cron。
+
 ## 数据源原则
 
 X/Twitter 采集必须使用 provider 模式：

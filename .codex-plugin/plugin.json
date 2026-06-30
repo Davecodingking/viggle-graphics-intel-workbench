@@ -1,6 +1,6 @@
 {
   "name": "ai-intel-workbench",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Local daily AI intelligence workbench with configurable sources, industry anchors, output language, static HTML dashboard, optional push bots, and scheduled runs.",
   "repository": "https://github.com/weishao831/ai-intel-workbench",
   "homepage": "https://github.com/weishao831/ai-intel-workbench",
@@ -20,7 +20,7 @@
   "interface": {
     "displayName": "AI Intel Workbench",
     "shortDescription": "Run a local multilingual daily AI intelligence dashboard and digest workflow.",
-    "longDescription": "A local-first daily intelligence workbench for AI practitioners. Configure industry anchors, output language, sources, X/Twitter collection providers, push bots, and scheduled runs; generate structured daily digests and view them in a zero-dependency HTML dashboard.",
+    "longDescription": "A local-first daily intelligence workbench for AI practitioners. Use natural-language prompts or scripts to configure industry anchors, output language, sources, X/Twitter collection providers, push bots, and agent-native or local scheduled runs; generate structured daily digests and view them in a zero-dependency HTML dashboard.",
     "developerName": "Wesber",
     "category": "Productivity",
     "capabilities": [
@@ -29,6 +29,8 @@
     ],
     "defaultPrompt": [
       "初始化每日资讯工作台",
+      "帮我关注 AI+加密和 AI+金融，每天 08:30 自动生成每日情报",
+      "Set up AI Intel Workbench for AI + finance, English output, and schedule your daily run",
       "生成今天的 AI 情报 digest",
       "帮我安装每日定时任务"
     ],

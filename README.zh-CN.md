@@ -97,11 +97,29 @@ skills/daily-intelligence-workbench/SKILL.md
 本地开发时，可把整个仓库作为 local plugin 源安装到 Codex；也可以在 Codex 中直接打开本目录工作。触发语示例：
 
 - 初始化每日资讯工作台
+- 帮我关注 AI+加密和 AI+金融，每天 08:30 自动生成每日情报
+- 初始化这个工作台，输出英文，不推送，先每天早上生成本地看板
 - 生成今天的 AI 情报 digest
 - 帮我安装每日定时任务
 - 配置 X/Twitter 采集 provider
 
 Codex agent 应先读取 `skills/daily-intelligence-workbench/SKILL.md`，再执行脚本。
+
+### 直接用自然语言初始化
+
+你不需要手动记所有 Python 命令，也可以直接对 Agent 说：
+
+```text
+帮我初始化每日资讯工作台，关注 AI+加密和 AI+金融，产出中文；如果没有推送机器人，就先只更新本地看板；每天早上 08:30 自动运行。
+```
+
+或：
+
+```text
+Set up AI Intel Workbench for AI + finance, English output, no push yet, and schedule your daily run at 08:30.
+```
+
+Agent 应该读取 skill 后自动完成：初始化配置、写入行业锚定、设置产出语言、判断是否启用推送，并在支持 agent 原生定时任务的环境中创建自己的每日任务；若当前 Agent 没有原生定时能力，则使用 `scripts/install_schedule.py` 安装本地 launchd / cron 定时任务。
 
 ---
 

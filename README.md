@@ -77,6 +77,18 @@ http://127.0.0.1:4318/?lang=zh
 
 Any agent runtime that can read a skill or instruction file, run local scripts, and trigger or install scheduled tasks can use this repository.
 
+You can also set it up through natural language. For example:
+
+```text
+Set up AI Intel Workbench for AI + crypto and AI + finance, use English output, do not push yet, and schedule your daily run at 08:30.
+```
+
+```text
+Initialize this workbench, track AI + finance, push to Lark if a webhook is configured, and run it every weekday morning.
+```
+
+The agent should read the skill, initialize config, choose the requested output language, and either create its own native recurring task when supported or install the local OS schedule with `scripts/install_schedule.py`.
+
 Codex should read:
 
 ```text

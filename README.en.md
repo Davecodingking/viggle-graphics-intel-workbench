@@ -127,11 +127,29 @@ skills/daily-intelligence-workbench/SKILL.md
 Starter prompts:
 
 - Initialize the daily intelligence workbench
+- Set up AI Intel Workbench for AI + finance, English output, and schedule your daily run
+- Track AI + crypto and AI + finance every morning at 08:30, then push to Lark if configured
 - Generate today's AI intelligence digest
 - Install the daily schedule
 - Configure the X/Twitter provider
 
 Codex should read `skills/daily-intelligence-workbench/SKILL.md` before running scripts.
+
+### Natural-Language Setup
+
+You do not need to memorize the Python commands. You can ask an agent directly:
+
+```text
+Set up AI Intel Workbench for AI + crypto and AI + finance, use English output, do not push yet, and schedule your daily run at 08:30.
+```
+
+Or:
+
+```text
+Initialize this workbench, track AI + finance, push to Lark if a webhook is configured, and run it every weekday morning.
+```
+
+The agent should read the skill, initialize configuration, write industry anchors, set output language, decide whether push is enabled, and create an agent-native recurring task when the current host supports it. If native agent scheduling is unavailable, it should install a local launchd / cron schedule through `scripts/install_schedule.py`.
 
 ---
 
