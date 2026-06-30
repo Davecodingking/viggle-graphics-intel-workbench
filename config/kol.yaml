@@ -1,0 +1,91 @@
+# ============================================================
+# KOL 名单 kol.yaml —— 2026-06-29 第三轮：扩到 55 人(约 49 X + 6 国内)，X 一手验证
+# status: keep(保留) / new(本期新增) / watch(待核实或观察) / drop(建议剔除)
+# platform: X / 微博 / 即刻
+# ============================================================
+meta:
+  version: 3
+  updated: 2026-06-29
+  count: 55
+  source_priority: "X(一手) > 个人博客/newsletter > 聚合(AINews) > 二手媒体；X 抓取用 Chrome 扩展 + site:x.com"
+  update_rule: "每周体检；新热点出现就从 X 反向发现新声音(如本轮 loop engineering 带出 @bcherny/@steipete/@addyosmani)"
+
+前沿研究者:
+  - { handle: "@karpathy",       name: "Andrej Karpathy",  field: "LLM 教育/agent 思辨", platform: X, status: keep }
+  - { handle: "@ylecun",         name: "Yann LeCun",       field: "世界模型/深度学习",   platform: X, status: keep }
+  - { handle: "@demishassabis",  name: "Demis Hassabis",   field: "DeepMind CEO",       platform: X, status: keep }
+  - { handle: "@ilyasut",        name: "Ilya Sutskever",   field: "对齐(SSI)",          platform: X, status: keep }
+  - { handle: "@fchollet",       name: "François Chollet", field: "ARC-AGI/Keras",      platform: X, status: keep }
+  - { handle: "@drfeifei",       name: "Fei-Fei Li",       field: "空间智能(World Labs)", platform: X, status: keep }
+
+大厂负责人与研究员:
+  - { handle: "@sama",           name: "Sam Altman",       field: "OpenAI CEO",         platform: X, status: keep }
+  - { handle: "@gdb",            name: "Greg Brockman",    field: "OpenAI 总裁",        platform: X, status: keep }
+  - { handle: "@merettm",        name: "Jakub Pachocki",   field: "OpenAI 首席科学家",   platform: X, status: keep }
+  - { handle: "@DarioAmodei",    name: "Dario Amodei",     field: "Anthropic CEO",      platform: X, status: keep }
+  - { handle: "@alexalbert__",   name: "Alex Albert",      field: "Anthropic DevRel",   platform: X, status: new }
+  - { handle: "@OfficialLoganK", name: "Logan Kilpatrick", field: "Google AI Studio",   platform: X, status: keep }
+  - { handle: "@arthurmensch",   name: "Arthur Mensch",    field: "Mistral CEO",        platform: X, status: keep }
+  - { handle: "@miramurati",     name: "Mira Murati",      field: "Thinking Machines",  platform: X, status: watch }
+
+AI工程与Agent:
+  - { handle: "@bcherny",        name: "Boris Cherny",     field: "Claude Code 作者/loop", platform: X, status: new }
+  - { handle: "@swyx",           name: "Shawn Wang",       field: "Latent Space/AI 工程", platform: X, status: keep }
+  - { handle: "@simonw",         name: "Simon Willison",   field: "agent 安全/prompt injection", platform: X, status: keep }
+  - { handle: "@steipete",       name: "Peter Steinberger",field: "loop engineering 推手", platform: X, status: new }
+  - { handle: "@addyosmani",     name: "Addy Osmani",      field: "agentic engineering(Google)", platform: X, status: new }
+  - { handle: "@mipsytipsy",     name: "Charity Majors",   field: "可观测性/AI 工程",    platform: X, status: new }
+  - { handle: "@omarsar0",       name: "Elvis Saravia",    field: "prompt(DAIR.AI)",    platform: X, status: new }
+
+开源与模型:
+  - { handle: "@natolambert",    name: "Nathan Lambert",   field: "post-training(Ai2)", platform: X, status: keep }
+  - { handle: "@jeremyphoward",  name: "Jeremy Howard",    field: "fast.ai/模型评测",    platform: X, status: new }
+  - { handle: "@Teknium",        name: "Teknium",          field: "Nous Research",      platform: X, status: new }
+  - { handle: "@Zai_org",        name: "Z.ai (智谱)",      field: "GLM 开源模型",        platform: X, status: new }
+
+评测与安全:
+  - { handle: "@METR_Evals",     name: "METR",             field: "危险能力评测",        platform: X, status: new }
+  - { handle: "@apolloaievals",  name: "Apollo Research",  field: "对齐/欺骗评测",       platform: X, status: new }
+
+具身与世界模型:
+  - { handle: "@DrJimFan",       name: "Jim Fan",          field: "具身智能(NVIDIA)",    platform: X, status: keep }
+  - { handle: "@JohnJumperSci",  name: "John Jumper",      field: "AI for science(诺奖→Anthropic)", platform: X, status: new }
+  - { handle: "@chelseabfinn",   name: "Chelsea Finn",     field: "机器人(Physical Intelligence)", platform: X, status: watch }
+  - { handle: "@svlevine",       name: "Sergey Levine",    field: "机器人 RL",          platform: X, status: watch }
+
+多模态与资讯速递:
+  - { handle: "@_akhaliq",       name: "AK",               field: "论文/demo 第一传播",  platform: X, status: keep }
+  - { handle: "@rohanpaul_ai",   name: "Rohan Paul",       field: "AI 资讯/论文解读",    platform: X, status: new }
+  - { handle: "@kimmonismus",    name: "Chubby",           field: "AI 突发快报",        platform: X, status: new }
+  - { handle: "@mreflow",        name: "Matt Wolfe",       field: "AI 工具科普",        platform: X, status: new }
+  - { handle: "@sharbel",        name: "Sharbel",          field: "GitHub 增速榜/开源情报", platform: X, status: new }
+  - { handle: "@seelffff",       name: "self.dll",         field: "开源 repo 速递",     platform: X, status: new }
+
+应用与投资创业:
+  - { handle: "@emollick",       name: "Ethan Mollick",    field: "AI 与职场(Wharton)", platform: X, status: keep }
+  - { handle: "@AndrewYNg",      name: "Andrew Ng",        field: "AI 教育/趋势",       platform: X, status: keep }
+  - { handle: "@bindureddy",     name: "Bindu Reddy",      field: "企业 AI agent(Abacus)", platform: X, status: new }
+  - { handle: "@a16z",           name: "a16z",             field: "AI 投资",            platform: X, status: new }
+  - { handle: "@martin_casado",  name: "Martin Casado",    field: "AI 投资/政策(a16z)", platform: X, status: new }
+
+AI编码与loop圈:
+  - { handle: "@0xCodez",        name: "Codez",            field: "loop engineering 解读", platform: X, status: new }
+  - { handle: "@sairahul1",      name: "Rahul",            field: "loop/agent 工程",    platform: X, status: new }
+  - { handle: "@AravSrinivas",   name: "Aravind Srinivas", field: "Perplexity CEO",     platform: X, status: keep }
+
+AIxCrypto与DeFAI:
+  - { handle: "@shawmakesmagic", name: "Shaw Walters",     field: "Eliza 框架",         platform: X, status: keep }
+  - { handle: "@aixbt_agent",    name: "aixbt",            field: "AI×crypto 情报 agent", platform: X, status: watch }
+  - { handle: "@KyleSamani",     name: "Kyle Samani",      field: "Multicoin/理性质疑", platform: X, status: watch }
+  - { handle: "@bengoertzel",    name: "Ben Goertzel",     field: "去中心化 AI/AGI",    platform: X, status: watch }
+
+国内中文圈:
+  - { handle: "@op7418",            name: "歸藏 (guizang.ai)", field: "AI 视觉/资讯(AIGC Weekly)", platform: X,  status: new }
+  - { handle: "@dotey",             name: "宝玉 (Baoyu)",   field: "AI 工程/翻译",        platform: X,  status: new }
+  - { handle: "@_zheergen",         name: "爱吃折耳根的Ace",  field: "AI+股票投研(UZI-Skill)", platform: X,  status: new }
+  - { handle: "微博·歸藏的AI工具箱",  name: "歸藏",           field: "AI 工具",            platform: 微博, status: new }
+  - { handle: "微博·宝玉xp",         name: "宝玉",           field: "AI 工程",            platform: 微博, status: new }
+  - { handle: "即刻·orange.ai",      name: "Orange",         field: "AI 创业/内容",       platform: 即刻, status: watch }
+
+# 待核实(下次落库前抽样打开主页确认)：@rasbt @miramurati @chelseabfinn @svlevine @aixbt_agent @KyleSamani @bengoertzel @_zheergen 的具体领域
+candidates: []

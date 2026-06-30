@@ -1,0 +1,22 @@
+# ============================================================
+# 运行配置 runtime.yaml —— 本地运行、agent 命令、服务端口、定时任务
+# ============================================================
+workspace: .
+server_host: 127.0.0.1
+server_port: 4318
+output_language: zh
+
+# 可选：让定时任务调用 Claude Code / Codex CLI 完成调研。
+# 占位符：
+#   {date}   YYYY-MM-DD
+#   {root}   当前工作台根目录
+#   {prompt} scripts/run_daily.py 生成的 research_prompt.md
+#
+# 示例（按本机实际 CLI 调整，默认留空，不自动调用任何外部 agent）：
+# agent_command: claude -p "$(cat {prompt})"
+# agent_command: codex exec "$(cat {prompt})"
+agent_command:
+
+schedule_time: "08:30"
+schedule_push: false
+provider_default: public-web

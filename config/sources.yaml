@@ -1,0 +1,89 @@
+# ============================================================
+# 信源配置 sources.yaml
+# 每日调研的「抓取范围」由本文件定义。新增/删除信源只改这里，
+# 调研 Agent 会按 dimension 分组读取。check_freq 仅作建议节奏。
+# ============================================================
+
+meta:
+  version: 1
+  updated: 2026-06-29
+  note: 开源后可按需增删；带 official=true 的为一手源，优先级最高
+
+dimensions:
+
+  # 维度一：AI 大厂一手信息
+  ai-labs:
+    cn_name: AI 大厂一手信息
+    check_freq: daily
+    sources:
+      - { name: OpenAI Blog,            url: https://openai.com/blog,                official: true }
+      - { name: Anthropic News,         url: https://www.anthropic.com/news,         official: true }
+      - { name: Google DeepMind Blog,   url: https://deepmind.google/discover/blog,  official: true }
+      - { name: Google AI Blog,         url: https://blog.google/technology/ai,      official: true }
+      - { name: NVIDIA Newsroom,        url: https://nvidianews.nvidia.com,          official: true }
+      - { name: Meta AI Blog,           url: https://ai.meta.com/blog,               official: true }
+      - { name: xAI News,               url: https://x.ai/news,                      official: true }
+      - { name: Mistral News,           url: https://mistral.ai/news,                official: true }
+      - { name: Microsoft AI Blog,      url: https://blogs.microsoft.com/ai,         official: true }
+      - { name: Manus Blog,             url: https://manus.im/blog,                  official: true }
+      - { name: DeepSeek,               url: https://api-docs.deepseek.com/news,     official: true }
+      - { name: 通义千问 Qwen Blog,      url: https://qwenlm.github.io/blog,          official: true }
+      # 二手聚合（交叉验证用）
+      - { name: TechCrunch AI,          url: https://techcrunch.com/category/artificial-intelligence, official: false }
+      - { name: VentureBeat AI,         url: https://venturebeat.com/category/ai,    official: false }
+      - { name: The Verge AI,           url: https://www.theverge.com/ai-artificial-intelligence, official: false }
+
+  # 维度二：KOL 观点与热门讨论（KOL 名单单独维护在 kol.yaml）
+  kol-views:
+    cn_name: KOL 观点与热门讨论
+    check_freq: daily
+    priority: X 一手优先 —— X(Twitter) 是最新信息源，先穷尽 X / 聚合 X 的渠道，再用二手补全
+    sources:
+      # ① X 一手 + 聚合 X 的最快渠道（最高优先）
+      - { name: AINews,                 url: https://news.smol.ai,          note: ★swyx 团队每天聚合 X/Reddit/Discord 的 AI 讨论，抓 X 最新最对口 }
+      - { name: X / Twitter,            url: https://x.com,                 note: 直接抓取受限 → 配合 site:x.com 搜索 + nitter 镜像 + threadreaderapp }
+      - { name: TLDR AI,                url: https://tldr.tech/ai,          note: 每日 AI 要闻，含 X 热帖 }
+      - { name: alphaSignal,            url: https://alphasignal.ai,        note: 工程师向每日 AI，X 热度驱动 }
+      - { name: Gate-News search_x (MCP), url: mcp://Gate-News/news_feed_search_x, note: 加密+AI 的 X 舆情 }
+      # ② 个人博客 / newsletter（一线作者一手）
+      - { name: Simon Willison 博客,     url: https://simonwillison.net,     note: 几乎每日更新，agent 安全/模型实测第一现场 }
+      - { name: Latent Space,           url: https://www.latent.space,      note: swyx，AI Engineering 播客+日报 }
+      - { name: Interconnects,          url: https://www.interconnects.ai,  note: Nathan Lambert，post-training/开源 }
+      - { name: The Batch (DeepLearning.AI), url: https://www.deeplearning.ai/the-batch, note: Andrew Ng 周报 }
+      # ③ 技术社区
+      - { name: Hacker News,            url: https://news.ycombinator.com,  note: 技术圈讨论风向 + Show HN }
+
+  # 维度三：前沿论文
+  papers:
+    cn_name: 前沿论文
+    check_freq: daily
+    sources:
+      - { name: Hugging Face Papers,    url: https://huggingface.co/papers,  note: 按社区点赞排序，过滤利器 }
+      - { name: arXiv cs.AI,            url: https://arxiv.org/list/cs.AI/recent }
+      - { name: arXiv cs.CL,            url: https://arxiv.org/list/cs.CL/recent }
+      - { name: arXiv cs.LG,            url: https://arxiv.org/list/cs.LG/recent }
+      - { name: alphaXiv,               url: https://www.alphaxiv.org,       note: 论文讨论热度 }
+      - { name: Papers with Code,       url: https://paperswithcode.com,     note: 带代码与 SOTA 榜 }
+
+  # 维度四：热门开源项目
+  open-source:
+    cn_name: 热门开源项目
+    check_freq: daily
+    sources:
+      - { name: GitHub Trending,        url: https://github.com/trending,    note: daily/weekly 切换 }
+      - { name: OSSInsight Trending,    url: https://ossinsight.io/collections/trending, note: 实时星标增速榜 }
+      - { name: Product Hunt,           url: https://www.producthunt.com,    note: 偏产品/工具 }
+      - { name: Hacker News Show HN,    url: https://news.ycombinator.com/show }
+
+  # 维度五：AI × 金融/加密/股票/交易
+  ai-finance:
+    cn_name: AI × 金融/加密/股票/交易
+    check_freq: daily
+    sources:
+      - { name: Gate-News (MCP),        url: "mcp://Gate-News/*",            note: 加密一手新闻/事件/X/UGC }
+      - { name: Gate-Info (MCP),        url: "mcp://Gate-Info/*",            note: 加密大盘情绪/链上/DeFi 指标 }
+      - { name: CoinDesk,               url: https://www.coindesk.com }
+      - { name: The Block,              url: https://www.theblock.co }
+      - { name: a16z crypto,            url: https://a16zcrypto.com/posts }
+      - { name: 财联社/上证报/新浪财经,   url: https://www.cls.cn,            note: 国内券商 AI 投研动态 }
+      - { name: J.P. Morgan / 金融机构博客, url: https://www.jpmorgan.com/payments/newsroom }

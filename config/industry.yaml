@@ -1,0 +1,77 @@
+# ============================================================
+# 行业锚定 industry.yaml —— 决定每日调研的重点方向
+# 初次使用由 scripts/init.py 写入 anchors；之后可手动改。
+# 影响：① 各维度搜索词拼接行业关键词 ② boost 维度多抓且靠前
+#       ③ 额外信源入池 ④ focus 注入调研 agent 的「重点关注」
+# ============================================================
+meta:
+  version: 1
+  updated: 2026-06-29
+
+# 当前锚定行业（用户初始化时选择，可多选）—— Wesber 当前：AI+加密、AI+金融
+anchors:
+  - ai-crypto
+  - ai-finance
+
+# 行业画像库（开源用户按自己行业增删/新增）
+profiles:
+  ai-crypto:
+    cn: AI + 加密
+    keywords: [DeFAI, "AI agent on-chain", "crypto AI", "AI trading agent", "AI memecoin", 链上 AI, Virtuals]
+    boost_dimensions: [fin, oss]
+    extra_sources: ["Gate-News(MCP)", "Gate-Info(MCP)", CoinDesk, "The Block", "a16z crypto"]
+    focus: 关注 AI agent 上链、DeFAI、AI 发币、加密交易 agent、链上数据 AI、预测市场
+
+  ai-finance:
+    cn: AI + 金融
+    keywords: ["AI 投研", "量化 agent", "券商 Skill", "AI 风控", "AI hedge fund", "AI trading", "stock AI", AI 投顾]
+    boost_dimensions: [fin, oss]
+    extra_sources: [Bloomberg, 财联社, 上证报, "J.P. Morgan", 券商研报]
+    focus: 关注 AI 投研/量化/选股/风控/对冲基金/券商 AI 产品/交易 agent
+
+  # —— 以下为可选行业模板：开源用户初始化时可锚定 AI+其他行业 ——
+  ai-healthcare:
+    cn: AI + 医疗
+    keywords: ["AI drug discovery", "medical AI", "AI diagnosis", protein, 蛋白质]
+    boost_dimensions: [paper, lab]
+    extra_sources: [Nature, "Google DeepMind", bioRxiv]
+    focus: 关注 AI 制药、医学影像、诊断、生物计算
+  ai-legal:
+    cn: AI + 法律
+    keywords: ["legal AI", "AI contract review", "AI compliance", 合规]
+    boost_dimensions: [oss, fin]
+    extra_sources: []
+    focus: 关注法律 AI、合同审查、合规科技
+  ai-education:
+    cn: AI + 教育
+    keywords: ["AI tutor", "AI education", "personalized learning"]
+    boost_dimensions: [oss, kol]
+    extra_sources: []
+    focus: 关注 AI 教育、个性化学习、知识工具
+  ai-robotics:
+    cn: AI + 机器人/具身
+    keywords: ["embodied AI", "humanoid robot", "world model", VLA, 具身]
+    boost_dimensions: [paper, lab]
+    extra_sources: [NVIDIA, "Physical Intelligence"]
+    focus: 关注具身智能、人形机器人、世界模型、VLA
+  ai-gaming:
+    cn: AI + 游戏
+    keywords: ["AI game", "generative game", "AI NPC", procedural]
+    boost_dimensions: [oss, lab]
+    extra_sources: []
+    focus: 关注 AI 游戏生成、NPC、世界生成
+  ai-general:
+    cn: AI 通用（不特别锚定行业）
+    keywords: []
+    boost_dimensions: []
+    extra_sources: []
+    focus: 五维度均衡覆盖，不偏向特定行业
+
+# 调研流程如何使用（供 agent / 脚本读取）
+usage: |
+  1. 读 anchors → 取各 profile；
+  2. keywords 拼进 keywords.yaml 对应维度搜索词（尤其 ai-finance/ai-crypto 维度）；
+  3. boost_dimensions 的维度多抓 2-3 条、排序靠前、可在 lark 推送出 Top3；
+  4. extra_sources 加入 sources.yaml 信源池；
+  5. focus 注入调研 agent 的 prompt 作为「本工作区重点关注方向」。
+  —— 换行业只需改 anchors（或重跑 scripts/init.py），调研重点随之改变，无需动代码。

@@ -1,0 +1,46 @@
+# ============================================================
+# 关键词与过滤规则 keywords.yaml
+# 用于：① 搜索时拼接关键词；② 清洗阶段打标签 + 过滤噪音。
+# 「强过滤无用信息」就靠 exclude + min_signal 实现。
+# ============================================================
+
+meta:
+  version: 1
+  updated: 2026-06-29
+
+# 搜索时优先拼接的英文关键词（research-analyst 用英文搜，结果整理为中文）
+search_terms:
+  ai-labs:     ["announcement", "release", "launch", "research", "model", "paper", "June 2026"]
+  kol-views:   ["AI Twitter discussion", "X trending", "most discussed AI", "debate", "thread"]
+  papers:      ["arxiv", "huggingface papers", "trending paper", "state of the art", "benchmark"]
+  open-source: ["github trending", "fastest growing repo", "open source AI", "stars"]
+  ai-finance:  ["AI agent", "DeFAI", "AI trading", "AI in finance", "AI stock research", "券商 AI 投研"]
+
+# 主题标签字典（命中即打标签，用于热点聚合与跨天对比）
+topic_tags:
+  - { tag: "Agent",         match: ["agent", "agentic", "autonomous", "智能体"] }
+  - { tag: "推理",          match: ["reasoning", "reason", "thinking", "推理"] }
+  - { tag: "多模态",        match: ["multimodal", "vision", "video", "image", "多模态"] }
+  - { tag: "成本/效率",     match: ["efficiency", "cost", "token", "cache", "cheap", "成本", "效率"] }
+  - { tag: "评测",          match: ["benchmark", "eval", "evaluation", "reliability", "评测"] }
+  - { tag: "世界模型",      match: ["world model", "jepa", "simulation", "世界模型"] }
+  - { tag: "具身/机器人",   match: ["robot", "embodied", "physical", "具身", "机器人"] }
+  - { tag: "上下文工程",    match: ["context engineering", "prompt", "rag", "memory", "上下文"] }
+  - { tag: "编码",          match: ["coding", "code", "swe-bench", "copilot", "编程"] }
+  - { tag: "DeFAI",         match: ["defai", "on-chain agent", "defi"] }
+  - { tag: "加密+AI",       match: ["crypto ai", "ai token", "virtuals", "memecoin", "发币"] }
+  - { tag: "监管/合规",     match: ["regulation", "compliance", "export control", "监管", "管制", "合规"] }
+  - { tag: "微调/训练",     match: ["fine-tune", "fine-tuning", "training", "rl", "post-training", "微调"] }
+
+# 噪音过滤：标题/正文命中以下任一即降权或丢弃
+exclude:
+  hard_drop:   ["招聘", "hiring", "webinar 报名", "限时优惠", "广告", "sponsored"]
+  soft_demote: ["roundup", "weekly digest 转载", "纯榜单无内容", "重复报道"]
+
+# 清洗阈值
+filters:
+  min_signal: 1          # 至少命中 1 个 topic_tag 才保留
+  require_url: true      # 必须有可访问来源 URL
+  dedup_by: ["url", "title_cn"]  # 去重键
+  max_items_per_dimension: 12
+  date_window_days: 14   # 默认只保留最近 14 天；窗口外需 heat=high 才破例（并标注日期）

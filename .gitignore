@@ -1,0 +1,9 @@
+.DS_Store
+__pycache__/
+*.pyc
+.daily-intel/
+config/secrets.env
+config/local.env
+config/*.local.yaml
+logs/
+tmp/
