@@ -3,10 +3,25 @@
 """Validate a generated digest.js and manifest.js using lightweight checks."""
 
 import argparse
+import json
 import re
 import sys
 
 from common import ROOT, digest_path_for, extract_latest_from_manifest, read_text, slash_date
+
+
+def load_strict_payload(raw):
+    m = re.search(r'window\.__DAILY__\[[^\]]+\]\s*=\s*(\{.*\})\s*;?\s*$', raw, re.S)
+    if not m:
+        return None
+    try:
+        return json.loads(m.group(1))
+    except json.JSONDecodeError:
+        return None
+
+
+def prop(name):
+    return r'(?:"%s"|%s)\s*:\s*' % (re.escape(name), re.escape(name))
 
 
 def validate_digest(date_value):
@@ -31,10 +46,17 @@ def validate_digest(date_value):
     if not re.search(r'\bdate\s*:\s*"%s"' % re.escape(key.replace("/", "-")), raw) and key.replace("/", "-") not in raw:
         warnings.append("未显式找到 date=%s" % key.replace("/", "-"))
 
-    item_ids = re.findall(r'\bid\s*:\s*"([^"]+)"', raw)
-    dims = re.findall(r'\bkey\s*:\s*"([^"]+)"', raw)
-    hot_topics = re.findall(r'\btitle\s*:\s*"([^"]+)"[^{}\n]*\bheat\s*:', raw)
-    urls = re.findall(r'\burl\s*:\s*"([^"]+)"', raw)
+    payload = load_strict_payload(raw)
+    if payload:
+        item_ids = [item.get("id", "") for item in payload.get("items", [])]
+        dims = [dim.get("key", "") for dim in payload.get("dimensions", [])]
+        hot_topics = [topic.get("title", "") for topic in payload.get("hot_topics_today", [])]
+        urls = [item.get("url", "") for item in payload.get("items", []) if item.get("url")]
+    else:
+        item_ids = re.findall(prop("id") + r'"([^"]+)"', raw)
+        dims = re.findall(prop("key") + r'"([^"]+)"', raw)
+        hot_topics = re.findall(prop("title") + r'"([^"]+)"[^{}\n]*' + prop("heat"), raw)
+        urls = re.findall(prop("url") + r'"([^"]+)"', raw)
 
     if len(item_ids) < 1:
         errors.append("items 里未识别到 id")
@@ -42,6 +64,18 @@ def validate_digest(date_value):
         errors.append("dimensions 里未识别到 key")
     if len(urls) < max(1, len(item_ids) // 2):
         warnings.append("URL 数量偏少：%d urls / %d items" % (len(urls), len(item_ids)))
+    if payload:
+        kol_items = [item for item in payload.get("items", []) if item.get("dim") == "kol"]
+        x_kol = [
+            item for item in kol_items
+            if "x.com/" in (item.get("url", "") + " " + " ".join(item.get("x_src") or []))
+            or str(item.get("source", "")).lower().startswith(("x", "twitter"))
+        ]
+        if kol_items:
+            ratio = len(x_kol) / float(len(kol_items))
+            print("[validate] kol_x_sources=%d/%d (%.0f%%)" % (len(x_kol), len(kol_items), ratio * 100))
+            if ratio < 0.5:
+                warnings.append("KOL 维度 X 来源占比偏低：%d/%d；请优先补公开 X status/profile 或 x_src" % (len(x_kol), len(kol_items)))
 
     manifest = read_text(ROOT / "data" / "manifest.js")
     if 'latest: "%s"' % key not in manifest and '"%s"' % key not in manifest:

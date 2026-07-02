@@ -4,7 +4,7 @@
 
 AI Intel Workbench is a **local-first, open-source daily intelligence workflow for agents**. It helps Codex, Claude Code, or any skill-capable agent collect and structure daily AI + user-defined industry signals, then review them in a visual local dashboard.
 
-Use it to track AI lab updates, KOL opinions, frontier papers, open-source projects, and AI x finance / crypto / any configured industry. It includes configurable sources, industry anchors, structured digests, output-language selection, a zero-dependency HTML workbench, optional Lark/Feishu bot pushes, and local scheduled runs.
+Use it to track AI lab updates, X-first KOL opinions, frontier papers, open-source projects, and AI x finance / crypto / any configured industry. It includes configurable sources, a 55-person default KOL seed list, industry anchors, structured digests, output-language selection, a zero-dependency HTML workbench, optional Lark/Feishu bot pushes, and local scheduled runs.
 
 ![English dashboard](assets/screenshots/dashboard-en.png)
 
@@ -16,6 +16,7 @@ Use it to track AI lab updates, KOL opinions, frontier papers, open-source proje
 - Supports Chinese, English, or bilingual output.
 - Works as a Codex local plugin, a Claude Code repository workflow, or plain local Python scripts.
 - Supports optional Lark/Feishu push bots and local scheduling through macOS LaunchAgent or Linux cron.
+- Uses X-first KOL tracking by default; Gate-News `news_feed_search_x` is the recommended optional dependency for X/Twitter discussion aggregation when available.
 
 No personal webhook, cookie, token, API key, or X/Twitter session state is committed by default.
 
@@ -106,6 +107,7 @@ docs/调研方法论与Loop设计.md
 
 ## Documentation
 
+- [Changelog](CHANGELOG.md)
 - [Full English README](README.en.md)
 - [中文说明](README.zh-CN.md)
 

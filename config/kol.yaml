@@ -7,6 +7,7 @@ meta:
   version: 3
   updated: 2026-06-29
   count: 55
+  default_seed: true
   source_priority: "X(一手) > 个人博客/newsletter > 聚合(AINews) > 二手媒体；X 抓取用 Chrome 扩展 + site:x.com"
   update_rule: "每周体检；新热点出现就从 X 反向发现新声音(如本轮 loop engineering 带出 @bcherny/@steipete/@addyosmani)"
 

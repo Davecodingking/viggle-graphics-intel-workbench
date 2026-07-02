@@ -2,7 +2,7 @@
 
 [English](README.md) | [中文](README.zh-CN.md)
 
-Daily Intelligence Workbench is a **local-first, open-source deployable** workflow for daily AI industry intelligence. It combines configurable sources, industry anchors, agent-assisted research, structured digests, a local HTML dashboard, bot pushes, output-language selection, and local schedules.
+Daily Intelligence Workbench is a **local-first, open-source deployable** workflow for daily AI industry intelligence. It combines configurable sources, X-first KOL tracking, industry anchors, agent-assisted research, structured digests, a local HTML dashboard, bot pushes, output-language selection, and local schedules.
 
 Any agent runtime that can read a skill/instruction file, run local scripts, and trigger or install scheduled tasks can use this repository to initialize a workspace, produce daily intelligence, refresh the dashboard, and optionally push summaries to a bot.
 
@@ -15,6 +15,8 @@ Supported environments:
 - Plain local Python: Python 3 standard library is enough for the dashboard, validation, push, and scheduling scripts.
 
 > The open-source default does not include any personal webhook, cookie, token, or account state. X/Twitter login state, API keys, and push bots are configured locally by each user.
+
+> The default KOL seed list is included in `config/kol.yaml` with 55 AI researchers, lab leads, AI engineering voices, open-source/model builders, evaluation/safety accounts, AI x crypto voices, and Chinese-language AI commentators. Treat it as the initial tracking pool and edit it for your own domain.
 
 ---
 
@@ -188,6 +190,8 @@ Placeholders:
 
 The open-source workflow does not depend on a user's Chrome login state by default.
 
+For the KOL views track, the research loop is X-first: it should search public `x.com/.../status/...` URLs and configured X providers before using newsletters or blog fallbacks. The validator reports `kol_x_sources` so low X evidence is visible.
+
 Default provider:
 
 - Public web search / source discovery
@@ -199,6 +203,7 @@ Optional providers:
 
 - User-owned local Chrome or browser extension session
 - X API or third-party data APIs
+- Gate-News MCP, especially `news_feed_search_x`, for X/Twitter discussion aggregation and tweet-level evidence when available
 - User-supplied CSV/JSON/bookmark exports
 
 Safety rules:
@@ -237,6 +242,14 @@ Push after generation:
 ```bash
 export DAILY_INTEL_LARK_WEBHOOK="https://open.larksuite.com/open-apis/bot/v2/hook/xxx"
 python3 scripts/run_daily.py --date today --push
+```
+
+Multiple local bot targets are supported without committing webhooks:
+
+```bash
+export DAILY_INTEL_LARK_WEBHOOK_1="https://open.larksuite.com/open-apis/bot/v2/hook/xxx"
+export DAILY_INTEL_LARK_WEBHOOK_2="https://open.larksuite.com/open-apis/bot/v2/hook/yyy"
+python3 scripts/push_lark.py 2026/06/29 --dry-run
 ```
 
 ---

@@ -22,3 +22,5 @@ In that case, do not stop at explaining commands. Read the skill's Natural Langu
 Do not store browser cookies, X/Twitter session tokens, API keys, or webhook URLs in committed files. Keep user-specific secrets in local config files or environment variables.
 
 Honor `config/runtime.yaml` `output_language` when generating user-facing digest fields. Supported values are `zh`, `en`, and `bilingual`.
+
+For the KOL views dimension, use X-first sourcing: start from `config/kol.yaml`, search public X status/profile URLs, and use Gate-News MCP `news_feed_search_x` when available before falling back to newsletters or blogs. Preserve X URLs in `items[].url` or `items[].x_src`.

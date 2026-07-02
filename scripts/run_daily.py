@@ -11,6 +11,7 @@ or create an agent handoff prompt for Claude Code / Codex to complete research.
 import argparse
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -48,6 +49,36 @@ def js_value(obj, indent=2):
     return json.dumps(obj, ensure_ascii=False, indent=indent)
 
 
+def load_config_kol_list():
+    path = ROOT / "config" / "kol.yaml"
+    if not path.exists():
+        return []
+    items = []
+    for line in read_text(path).splitlines():
+        line = line.strip()
+        if not line.startswith("- {") or "handle:" not in line:
+            continue
+        row = {}
+        for key, quoted, bare in re.findall(r'(\w+):\s*(?:"([^"]*)"|([^,}]+))', line):
+            row[key] = (quoted or bare).strip()
+        if row.get("handle") and row.get("name"):
+            items.append({
+                "handle": row.get("handle", ""),
+                "name": row.get("name", ""),
+                "field": row.get("field", ""),
+                "platform": row.get("platform", ""),
+                "status": row.get("status", ""),
+            })
+    return items
+
+
+def apply_persistent_config(payload):
+    config_kol = load_config_kol_list()
+    if config_kol and len(payload.get("kol_list") or []) < len(config_kol):
+        payload["kol_list"] = config_kol
+    return payload
+
+
 def write_digest_from_json(date_value, json_path, language_override=None):
     date_iso = normalize_date(date_value)
     key = slash_date(date_iso)
@@ -66,6 +97,7 @@ def write_digest_from_json(date_value, json_path, language_override=None):
     payload.setdefault("items", [])
     payload.setdefault("kol_list", [])
     payload.setdefault("practice_list", [])
+    payload = apply_persistent_config(payload)
 
     out = digest_path_for(date_iso)
     text = [
@@ -168,11 +200,12 @@ def create_research_prompt(date_value, language_override=None):
 
 1. 读取 `config/industry.yaml`、`config/sources.yaml`、`config/keywords.yaml`、`config/kol.yaml`。
 2. 按五维度调研：AI 大厂动态、KOL 观点、前沿论文、开源项目、AI × 金融。
-3. 优先英文关键词与一手来源；X/Twitter 只用可访问的公开 status/profile，除非用户本地配置了登录态 provider。
-4. 过滤营销、招聘、重复与不可验证信息；保留来源 URL、日期和可信度说明。
-5. 按“产出语言”要求组织 `title`、`summary`、`detail`、`why`、`buzz`、`dimensions.overview`、`hot_topics_today.summary`、`practice_list` 等面向用户字段。
-6. 产出 canonical JSON，字段参考 `skills/daily-intelligence-workbench/references/data-schema.md`。
-7. 写入后运行：
+3. KOL 观点维度必须执行 X-first 流程：先从 `config/kol.yaml` 取重点 handle，用 `site:x.com/<handle>/status`、公开 X status/profile、已配置的 Gate-News `news_feed_search_x` / X API / 本机 provider 发现近 7 天帖子；目标是 KOL 维度至少 60% 条目来自 X status/profile 或带 `x_src` 的 X 证据。若达不到，必须在 `dimensions[].notes` 写明 provider 限制和 fallback 来源。
+4. 优先英文关键词与一手来源；X/Twitter 只用可访问的公开 status/profile 或用户本地显式配置的 provider，不读取 cookie/token。
+5. 过滤营销、招聘、重复与不可验证信息；保留来源 URL、日期和可信度说明。
+6. 按“产出语言”要求组织 `title`、`summary`、`detail`、`why`、`buzz`、`dimensions.overview`、`hot_topics_today.summary`、`practice_list` 等面向用户字段。
+7. 产出 canonical JSON，字段参考 `skills/daily-intelligence-workbench/references/data-schema.md`。
+8. 写入后运行：
 
 ```bash
 python3 scripts/run_daily.py --date {date_iso} --from-json <canonical-json-path>

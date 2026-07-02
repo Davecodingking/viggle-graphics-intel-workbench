@@ -27,6 +27,7 @@ X/Twitter 采集必须使用 provider 模式：
 
 - 默认：公共网页 / 搜索发现 / 公开 status 或 profile 读取。
 - 可选：用户本地 Chrome 登录态、浏览器扩展、X API 或第三方数据源。
+- KOL 观点维度必须 X-first：优先按 `config/kol.yaml` 的 handle 查公开 X status/profile；可使用 Gate-News MCP `news_feed_search_x` 做 X/Twitter 讨论聚合；只有 X 证据不足时才 fallback 到 newsletter / blog。
 - 不把任何用户账号、cookie、token、webhook 写入仓库；只使用本地 `config/*.yaml` 或环境变量。
 
 ## 输出约定

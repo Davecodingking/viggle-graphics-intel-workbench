@@ -97,12 +97,14 @@ When no structured JSON has been provided, run the research loop manually in the
 1. Read `config/industry.yaml`, `config/sources.yaml`, `config/keywords.yaml`, and `config/kol.yaml`.
 2. Build five research tracks: AI labs, KOL views, papers, open source, and AI x finance.
 3. Search with English keywords first, then use Chinese sources for local context when configured.
-4. Prefer primary sources: official blogs, arXiv, GitHub, project docs, public X status/profile pages, reputable media.
-5. Filter aggressively: remove marketing, duplicated reposts, job posts, unverifiable claims, and stale content.
-6. Write a temporary canonical JSON file matching `references/data-schema.md`.
-7. Convert it into dashboard format:
+4. For the KOL views track, run an X-first pass before newsletters: use the handles in `config/kol.yaml`, query `site:x.com/<handle>/status` plus configured Gate-News `news_feed_search_x`, X API, or local browser providers, and prefer public X status/profile URLs as `items[].url` or `items[].x_src`.
+5. Target at least 60% of KOL-view items with X evidence. If the public/provider path cannot reach that ratio, document the limitation in `dimensions[].notes` and only then fall back to AINews, Latent Space, Interconnects, blogs, or media summaries.
+6. Prefer primary sources: official blogs, arXiv, GitHub, project docs, public X status/profile pages, reputable media.
+7. Filter aggressively: remove marketing, duplicated reposts, job posts, unverifiable claims, and stale content.
+8. Write a temporary canonical JSON file matching `references/data-schema.md`.
+9. Convert it into dashboard format:
    - `python3 scripts/run_daily.py --date YYYY-MM-DD --from-json /path/to/digest.json --push`
-8. Validate and serve locally.
+10. Validate and serve locally.
 
 ## Scheduling
 

@@ -2,7 +2,7 @@
 
 [English](README.md) | [中文](README.zh-CN.md)
 
-本项目是一个**本地优先、可开源安装部署**的每日 AI 行业情报工作台。它把配置化信源、行业锚定、Agent 调研、结构化 digest、本地 HTML 工作台、机器人推送和本地定时任务串成一套可复用流程。
+本项目是一个**本地优先、可开源安装部署**的每日 AI 行业情报工作台。它把配置化信源、X-first KOL 追踪、行业锚定、Agent 调研、结构化 digest、本地 HTML 工作台、机器人推送和本地定时任务串成一套可复用流程。
 
 只要你的 Agent 具备读取 skill/说明文档、运行本地脚本、设置或触发定时任务的能力，就可以使用这个仓库完成初始化、每日调研、看板更新和可选机器人推送。
 
@@ -15,6 +15,8 @@
 - 普通本地运行：只依赖 Python 3 标准库即可打开工作台、校验数据、推送和设置定时任务。
 
 > 开源默认不内置任何个人 webhook、cookie、token 或账号态。X/Twitter 登录态、API Key、推送机器人都由用户本地自行配置。
+
+> 默认配置已内置 `config/kol.yaml` 作为初始 KOL 池，共 55 人，覆盖 AI 研究者、大厂负责人/研究员、AI 工程与 Agent、开源与模型、评测安全、AI x Crypto 和中文 AI 圈。你可以直接用它启动，也可以按自己的领域增删。
 
 ---
 
@@ -188,6 +190,8 @@ python3 scripts/run_daily.py --date today --language en
 
 开源版不默认依赖某个用户的 Chrome 登录态。
 
+KOL 观点维度采用 X-first：优先从 `config/kol.yaml` 的 handle 出发，检索公开 `x.com/.../status/...`、公开 profile、已配置 X provider 和 Gate-News `news_feed_search_x`，再 fallback 到 newsletter / blog / 媒体聚合。校验脚本会输出 `kol_x_sources`，用于发现 KOL 维度是否又退回二手来源。
+
 默认 provider：
 
 - 公共网页搜索发现 URL
@@ -199,6 +203,7 @@ python3 scripts/run_daily.py --date today --language en
 
 - 用户本地 Chrome/浏览器扩展，复用用户自己的登录态
 - X API 或第三方数据 API
+- Gate-News MCP，尤其是 `news_feed_search_x`，用于 X/Twitter 讨论聚合和可用时的推文级证据
 - 用户导出的 CSV/JSON/bookmarks
 
 安全原则：
@@ -242,6 +247,15 @@ python3 scripts/run_daily.py --date today --push
 
 # 或单独推送某天
 python3 scripts/push_lark.py "https://open.larksuite.com/open-apis/bot/v2/hook/xxx" 2026/06/29
+```
+
+也可以在本机 `config/secrets.env` 或环境变量中配置多个机器人，真实 webhook 不进仓库：
+
+```bash
+DAILY_INTEL_LARK_WEBHOOK_1=https://open.larksuite.com/open-apis/bot/v2/hook/xxx
+DAILY_INTEL_LARK_WEBHOOK_2=https://open.larksuite.com/open-apis/bot/v2/hook/yyy
+
+python3 scripts/push_lark.py 2026/06/29 --dry-run
 ```
 
 ---
@@ -366,10 +380,13 @@ skills/daily-intelligence-workbench/references/data-schema.md
 - [x] 本地 HTML 工作台
 - [x] 初始化配置
 - [x] Lark/飞书推送
+- [x] 多 Lark/飞书机器人本机私密配置
 - [x] Codex plugin manifest
 - [x] Claude Code / Codex skill
 - [x] 本地 run / validate / serve 脚本
 - [x] macOS launchd / Linux cron 定时任务
+- [x] 默认 55 人 KOL 池
+- [x] KOL 维度 X-first 校验
 - [ ] 完整公共网页采集器
 - [ ] Chrome provider 示例
 - [ ] X API provider 示例

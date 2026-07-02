@@ -49,5 +49,7 @@ Design implications:
 
 - Discover X URLs via web search, RSS-like third-party sources, curated KOL handles, or configured provider APIs.
 - Read the final status/profile URL as a public page whenever possible.
+- For the KOL views dimension, run X discovery before newsletter/blog fallbacks. A healthy daily digest should normally have a majority of KOL-view items backed by `x.com/.../status/...` URLs or `x_src` evidence.
+- If X discovery fails or returns only aggregate summaries, keep the aggregate as a signal but mark the limitation in `dimensions[].notes` and avoid presenting it as tweet-level evidence.
 - Keep Chrome login-state scraping optional and local.
 - Avoid any promise of "anti-ban" behavior. Use low-frequency, read-only, user-owned access and graceful fallbacks.

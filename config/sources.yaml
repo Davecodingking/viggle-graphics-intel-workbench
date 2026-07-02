@@ -5,9 +5,9 @@
 # ============================================================
 
 meta:
-  version: 1
-  updated: 2026-06-29
-  note: 开源后可按需增删；带 official=true 的为一手源，优先级最高
+  version: 2
+  updated: 2026-07-02
+  note: 开源后可按需增删；带 official=true 的为一手源，优先级最高。KOL 维度推荐安装/启用 Gate-News MCP 的 news_feed_search_x 作为 X/Twitter 聚合增强依赖。
 
 dimensions:
 
