@@ -5,16 +5,41 @@
 # ============================================================
 
 meta:
-  version: 1
-  updated: 2026-06-29
+  version: 2
+  updated: 2026-07-09
 
 # 搜索时优先拼接的英文关键词（research-analyst 用英文搜，结果整理为中文）
 search_terms:
-  ai-labs:     ["announcement", "release", "launch", "research", "model", "paper", "June 2026"]
-  kol-views:   ["AI Twitter discussion", "X trending", "most discussed AI", "debate", "thread"]
-  papers:      ["arxiv", "huggingface papers", "trending paper", "state of the art", "benchmark"]
-  open-source: ["github trending", "fastest growing repo", "open source AI", "stars"]
-  ai-finance:  ["AI agent", "DeFAI", "AI trading", "AI in finance", "AI stock research", "券商 AI 投研"]
+  ai-labs:     ["announcement", "release", "launch", "research", "model", "paper", "technical report", "system card", "alignment", "July 2026"]
+  kol-views:   ["AI Twitter discussion", "X trending", "most discussed AI", "debate", "thread", "X article", "researcher article", "Claude Code", "agentic engineering"]
+  papers:      ["arxiv", "huggingface papers", "trending paper", "state of the art", "benchmark", "technical report", "model card", "alignment research"]
+  open-source: ["github trending", "fastest growing repo", "open source AI", "stars", "social buzz", "X discussion", "AI trading agent GitHub", "quant agent GitHub"]
+  ai-finance:  ["AI agent", "DeFAI", "AI trading", "AI in finance", "AI stock research", "financial agent", "quant agent", "LLM quant", "券商 AI 投研", "量化 agent"]
+
+# 每日必须额外执行的高优先级查询（由 config/research_radar.yaml 解释）
+must_run_queries:
+  researcher_longform:
+    - 'site:x.com/trq212/article Anthropic Claude Code'
+    - 'site:x.com filter:articles "Claude Code" "Anthropic"'
+    - 'site:x.com filter:articles "OpenAI" "alignment" OR "research"'
+    - 'site:x.com "agentic engineering" "harness" "loops"'
+  lab_research:
+    - 'site:anthropic.com/research Anthropic research latest'
+    - 'site:alignment.openai.com OpenAI alignment research latest'
+    - 'site:openai.com/research OpenAI research latest'
+  chinese_frontier_labs:
+    - 'site:api-docs.deepseek.com/news DeepSeek latest model research'
+    - 'site:huggingface.co/deepseek-ai DeepSeek latest model card'
+    - 'site:moonshotai.github.io Kimi latest technical report agentic'
+    - 'site:huggingface.co/moonshotai Kimi latest model card'
+    - 'site:z.ai/blog GLM latest research long-horizon agentic'
+    - 'site:github.com/zai-org GLM technical report'
+  finance_quant_oss:
+    - 'site:x.com "AI trading agent" "GitHub"'
+    - 'site:x.com "quant agent" "GitHub"'
+    - 'site:x.com "financial agent" "open source"'
+    - 'site:github.com "AI trading agent" "LLM"'
+    - 'site:github.com "quantitative finance" "agent" "LLM"'
 
 # 主题标签字典（命中即打标签，用于热点聚合与跨天对比）
 topic_tags:
@@ -27,6 +52,10 @@ topic_tags:
   - { tag: "具身/机器人",   match: ["robot", "embodied", "physical", "具身", "机器人"] }
   - { tag: "上下文工程",    match: ["context engineering", "prompt", "rag", "memory", "上下文"] }
   - { tag: "编码",          match: ["coding", "code", "swe-bench", "copilot", "编程"] }
+  - { tag: "研究员长文",    match: ["x article", "article", "longform", "researcher", "长文", "研究员"] }
+  - { tag: "实验室研究",    match: ["research", "alignment", "interpretability", "technical report", "system card", "研究", "技术报告"] }
+  - { tag: "国产模型",      match: ["DeepSeek", "Kimi", "Moonshot", "GLM", "Z.ai", "Qwen", "智谱", "月之暗面", "通义"] }
+  - { tag: "金融/量化Agent", match: ["quant agent", "financial agent", "trading agent", "backtest", "broker", "量化", "投研", "回测"] }
   - { tag: "DeFAI",         match: ["defai", "on-chain agent", "defi"] }
   - { tag: "加密+AI",       match: ["crypto ai", "ai token", "virtuals", "memecoin", "发币"] }
   - { tag: "监管/合规",     match: ["regulation", "compliance", "export control", "监管", "管制", "合规"] }
@@ -44,3 +73,5 @@ filters:
   dedup_by: ["url", "title_cn"]  # 去重键
   max_items_per_dimension: 12
   date_window_days: 14   # 默认只保留最近 14 天；窗口外需 heat=high 才破例（并标注日期）
+  longform_min_detail_chars_zh: 650
+  researcher_longform_should_not_be_summarized_only: true

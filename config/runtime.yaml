@@ -17,6 +17,6 @@ output_language: zh
 # agent_command: codex exec "$(cat {prompt})"
 agent_command:
 
-schedule_time: "08:30"
-schedule_push: false
+schedule_time: "09:30"
+schedule_push: true
 provider_default: public-web

@@ -2,7 +2,7 @@
 
 [English](README.md) | [中文](README.zh-CN.md)
 
-Daily Intelligence Workbench is a **local-first, open-source deployable** workflow for daily AI industry intelligence. It combines configurable sources, X-first KOL tracking, industry anchors, agent-assisted research, structured digests, a local HTML dashboard, bot pushes, output-language selection, and local schedules.
+Daily Intelligence Workbench is a **local-first, open-source deployable** workflow for daily AI industry intelligence. It combines configurable sources, X-first KOL tracking, a research radar for researcher longform and lab papers, industry anchors, agent-assisted research, structured digests, a local HTML dashboard, bot pushes, output-language selection, and local schedules.
 
 Any agent runtime that can read a skill/instruction file, run local scripts, and trigger or install scheduled tasks can use this repository to initialize a workspace, produce daily intelligence, refresh the dashboard, and optionally push summaries to a bot.
 
@@ -16,7 +16,9 @@ Supported environments:
 
 > The open-source default does not include any personal webhook, cookie, token, or account state. X/Twitter login state, API keys, and push bots are configured locally by each user.
 
-> The default KOL seed list is included in `config/kol.yaml` with 55 AI researchers, lab leads, AI engineering voices, open-source/model builders, evaluation/safety accounts, AI x crypto voices, and Chinese-language AI commentators. Treat it as the initial tracking pool and edit it for your own domain.
+> The default KOL seed list is included in `config/kol.yaml` with 59 AI researchers, lab leads, AI engineering voices, open-source/model builders, evaluation/safety accounts, AI x crypto voices, and Chinese-language AI commentators. Treat it as the initial tracking pool and edit it for your own domain.
+
+> `config/research_radar.yaml` is now a first-class discovery layer for researcher X Articles, Anthropic/OpenAI research posts, DeepSeek/Kimi/Z.ai/Qwen model cards and technical reports, plus finance/quant agent repositories.
 
 ---
 
@@ -33,6 +35,7 @@ ai-intel-workbench/
 │   ├── sources.yaml
 │   ├── keywords.yaml
 │   ├── kol.yaml
+│   ├── research_radar.yaml
 │   ├── push.yaml
 │   ├── runtime.yaml
 │   └── secrets.example.env
@@ -114,6 +117,21 @@ Language modes:
 - `zh`: Simplified Chinese output; technical terms, company names, project names, and URLs stay in their original form.
 - `en`: English output; source names, project names, tickers, and URLs stay unchanged.
 - `bilingual`: Chinese-first bilingual output, with concise English equivalents for titles and key summaries where useful.
+
+---
+
+## Research Radar and Deep Summaries
+
+Some of the most valuable AI research signals do not look like ordinary news. They may be researcher X Articles, Anthropic Research posts, OpenAI Alignment notes, Hugging Face model cards, GitHub technical reports, or Chinese frontier-lab project pages.
+
+The workflow reads `config/research_radar.yaml` before generic news search:
+
+- `researcher_longform_watchlist`: researcher X Articles and longform posts.
+- `lab_research_watchlist`: Anthropic Research, OpenAI Research, OpenAI Alignment, Google DeepMind Research.
+- `chinese_frontier_lab_watchlist`: DeepSeek, Kimi/Moonshot, Z.ai/GLM, Qwen.
+- `open_source_finance_quant_watchlist`: finance agents, quant agents, AI stock-research agents, backtesting and broker/exchange integrations.
+
+For important longform or research items, the digest should set `content_type`, `depth: deep`, `key_points`, `examples`, `product_implications`, and `limitations`. The dashboard renders these fields so the user can understand most of the article without opening the original source.
 
 ---
 

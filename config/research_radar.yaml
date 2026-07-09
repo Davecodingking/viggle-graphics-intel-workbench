@@ -1,0 +1,193 @@
+# ============================================================
+# 研究雷达 research_radar.yaml
+# 目的：补上「容易漏掉的高价值研究员长文 / 实验室研究页 / 国产模型论文」
+# ============================================================
+
+meta:
+  version: 1
+  updated: 2026-07-09
+  owner_note: >
+    这不是普通信源清单，而是每日调研前必须先扫的高优先级雷达。
+    它用于发现没有进入官方新闻稿、但在 X Article、研究员博客、
+    alignment/research 子站、Hugging Face model card、GitHub tech report 中
+    正在被核心圈讨论的内容。
+
+priority_policy:
+  hard_priority_order:
+    - researcher_longform_recent
+    - lab_research_official
+    - chinese_frontier_lab_release
+    - paper_with_social_discussion
+    - open_source_finance_quant_agent
+  date_windows:
+    researcher_longform_recent_days: 10
+    lab_research_recent_days: 21
+    chinese_lab_recent_days: 30
+    paper_recent_days: 21
+    oss_recent_days: 21
+  daily_quotas:
+    min_researcher_longform_or_lab_research: 2
+    min_chinese_frontier_lab_checks: 3
+    min_finance_quant_oss_candidates: 6
+    min_finance_quant_oss_selected: 2
+  source_weight:
+    official_research_page: 1.0
+    official_model_card_or_github: 0.95
+    researcher_x_article: 0.92
+    researcher_blog_or_newsletter: 0.9
+    x_status_with_discussion: 0.82
+    reputable_media_summary: 0.65
+  fail_rule: >
+    如果当天没有选入任何研究员长文/官方研究页/国产模型论文，
+    必须在 dimensions[].notes 里写明「已扫但无入选」或「provider 受限」，
+    不允许静默缺失。
+
+longform_detail_policy:
+  applies_to:
+    - x_article
+    - official_research
+    - technical_report
+    - model_card
+    - long_blog
+  min_detail_chars_zh: 650
+  target_detail_chars_zh: 900
+  max_detail_chars_zh: 1400
+  required_sections:
+    - 背景：这篇文章/论文在回答什么问题
+    - 核心观点：作者真正想表达的 3-5 点
+    - 方法/机制：如果有技术或工作流，讲清大致逻辑
+    - 案例：给一个产品经理也能理解的例子
+    - 价值：对 AI 产品、Agent 工程、评测或行业判断的启发
+    - 边界：哪些结论还不能过度外推
+  dashboard_rule: >
+    对长文不要只写摘要。summary 负责 2-3 句小白版，
+    detail 负责让用户不跳原文也能了解七七八八。
+    如果原文很长，优先提炼结构、论证链和可复用方法，而不是逐段复述。
+
+researcher_longform_watchlist:
+  # Anthropic / Claude Code / Agent 工程
+  - handle: "@trq212"
+    name: "Thariq Shihipar"
+    org: "Anthropic / Claude Code"
+    focus: ["Claude Code", "agent workflow", "HTML as artifact", "work loops"]
+    urls:
+      - "https://x.com/trq212"
+      - "https://x.com/trq212/article/2073100352921215386"
+    why: 用户点名；Anthropic 研究员/工程师长文经常比官方新闻更早暴露实践范式
+  - handle: "@bcherny"
+    name: "Boris Cherny"
+    org: "Anthropic / Claude Code"
+    focus: ["Claude Code", "loop engineering", "agent harness"]
+    urls: ["https://x.com/bcherny"]
+  - handle: "@alexalbert__"
+    name: "Alex Albert"
+    org: "Anthropic"
+    focus: ["Claude", "developer platform", "agent product"]
+    urls: ["https://x.com/alexalbert__"]
+
+  # OpenAI / alignment / research
+  - handle: "@OpenAI"
+    name: "OpenAI"
+    org: "OpenAI"
+    focus: ["research", "alignment", "agent", "system card"]
+    urls:
+      - "https://openai.com/research/"
+      - "https://alignment.openai.com/"
+      - "https://x.com/OpenAI"
+    why: OpenAI 研究常在 openai.com 与 alignment.openai.com 分散发布，不能只看 blog 首页
+  - handle: "@sama"
+    name: "Sam Altman"
+    org: "OpenAI"
+    focus: ["strategy", "product", "frontier model"]
+    urls: ["https://x.com/sama"]
+  - handle: "@gdb"
+    name: "Greg Brockman"
+    org: "OpenAI"
+    focus: ["engineering", "infrastructure", "agent"]
+    urls: ["https://x.com/gdb"]
+  - handle: "@merettm"
+    name: "Jakub Pachocki"
+    org: "OpenAI"
+    focus: ["research leadership", "reasoning", "frontier models"]
+    urls: ["https://x.com/merettm"]
+
+lab_research_watchlist:
+  - name: "Anthropic Research"
+    priority: high
+    urls:
+      - "https://www.anthropic.com/research"
+      - "https://www.anthropic.com/news"
+    watch_terms: ["interpretability", "alignment", "agent", "Claude Code", "science", "workspace", "misalignment"]
+  - name: "OpenAI Research / Alignment"
+    priority: high
+    urls:
+      - "https://openai.com/research/"
+      - "https://alignment.openai.com/"
+      - "https://openai.com/index/"
+    watch_terms: ["alignment", "reinforcement learning", "agent", "beneficial", "system card", "research"]
+  - name: "Google DeepMind Research"
+    priority: medium
+    urls:
+      - "https://deepmind.google/discover/blog"
+      - "https://deepmind.google/research/"
+    watch_terms: ["world model", "robotics", "science", "agent", "Alpha", "Gemini"]
+
+chinese_frontier_lab_watchlist:
+  - name: "DeepSeek"
+    aliases: ["deepseek-ai", "深度求索"]
+    priority: high
+    urls:
+      - "https://api-docs.deepseek.com/news"
+      - "https://huggingface.co/deepseek-ai"
+      - "https://github.com/deepseek-ai"
+    watch_terms: ["DeepSeek", "V4", "V3", "R1", "reasoning", "sparse attention", "Engram"]
+  - name: "Moonshot AI / Kimi"
+    aliases: ["Kimi", "月之暗面", "moonshotai"]
+    priority: high
+    urls:
+      - "https://moonshotai.github.io/"
+      - "https://moonshotai.github.io/Kimi-K2/"
+      - "https://moonshotai.github.io/Kimi-Researcher/"
+      - "https://huggingface.co/moonshotai"
+      - "https://github.com/moonshotai/kimi-k2"
+    watch_terms: ["Kimi", "K2", "Kimi-Researcher", "agentic", "coding", "thinking", "Moonshot"]
+  - name: "Z.ai / 智谱"
+    aliases: ["Z.ai", "Zhipu", "智谱", "GLM"]
+    priority: high
+    urls:
+      - "https://z.ai/blog"
+      - "https://z.ai/blog/glm-5.2"
+      - "https://github.com/zai-org/GLM-5"
+      - "https://huggingface.co/zai-org"
+    watch_terms: ["GLM", "GLM-5.2", "long-horizon", "agentic engineering", "vibe coding"]
+  - name: "Qwen / 通义千问"
+    aliases: ["Qwen", "通义千问", "Alibaba"]
+    priority: medium
+    urls:
+      - "https://qwenlm.github.io/blog"
+      - "https://huggingface.co/Qwen"
+      - "https://github.com/QwenLM"
+    watch_terms: ["Qwen", "Agent", "World", "Coder", "VL", "long context"]
+
+open_source_finance_quant_watchlist:
+  search_queries:
+    - "site:x.com open source AI trading agent GitHub"
+    - "site:x.com quant agent GitHub LLM trading"
+    - "site:x.com financial agent framework GitHub"
+    - "site:x.com AI stock research agent GitHub"
+    - "site:x.com DeFAI agent GitHub trading"
+    - "site:github.com AI trading agent LLM quant"
+    - "site:github.com financial agent LLM stock research"
+  seed_projects:
+    - "TradingAgents"
+    - "Vibe-Trading"
+    - "UZI-Skill"
+    - "QuantDinger"
+    - "daily_stock_analysis"
+    - "QuantMind / LLMQuant"
+  selection_rule: >
+    开源项目不只看 GitHub stars。金融/量化 Agent 需要同时看：
+    1) X 是否有真实讨论；2) 是否能实际跑数据/回测/推送；
+    3) 是否有金融数据源或 broker/exchange 接口；
+    4) 是否有 agent 架构/skill/工作流沉淀；
+    5) 是否仍在活跃维护。星少但机制新、讨论早期升温的项目要标「潜力新星」。

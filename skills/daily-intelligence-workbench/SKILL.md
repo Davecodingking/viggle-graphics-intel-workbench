@@ -94,17 +94,23 @@ For the complete schema and validation expectations, read `references/data-schem
 
 When no structured JSON has been provided, run the research loop manually in the current agent:
 
-1. Read `config/industry.yaml`, `config/sources.yaml`, `config/keywords.yaml`, and `config/kol.yaml`.
-2. Build five research tracks: AI labs, KOL views, papers, open source, and AI x finance.
-3. Search with English keywords first, then use Chinese sources for local context when configured.
-4. For the KOL views track, run an X-first pass before newsletters: use the handles in `config/kol.yaml`, query `site:x.com/<handle>/status` plus configured Gate-News `news_feed_search_x`, X API, or local browser providers, and prefer public X status/profile URLs as `items[].url` or `items[].x_src`.
-5. Target at least 60% of KOL-view items with X evidence. If the public/provider path cannot reach that ratio, document the limitation in `dimensions[].notes` and only then fall back to AINews, Latent Space, Interconnects, blogs, or media summaries.
-6. Prefer primary sources: official blogs, arXiv, GitHub, project docs, public X status/profile pages, reputable media.
-7. Filter aggressively: remove marketing, duplicated reposts, job posts, unverifiable claims, and stale content.
-8. Write a temporary canonical JSON file matching `references/data-schema.md`.
-9. Convert it into dashboard format:
+1. Read `config/industry.yaml`, `config/sources.yaml`, `config/keywords.yaml`, `config/kol.yaml`, and `config/research_radar.yaml`.
+2. Before generic search, run the research-radar pass:
+   - Researcher longform / X Articles: especially Anthropic Claude Code and OpenAI/alignment researchers.
+   - Official research pages: Anthropic Research, OpenAI Research, OpenAI Alignment, Google DeepMind Research.
+   - Chinese frontier labs: DeepSeek, Kimi/Moonshot, Z.ai/GLM, Qwen. Check official pages, Hugging Face model cards, and GitHub technical reports.
+   - Open-source finance/quant agents: discover from X discussion plus GitHub topics, not GitHub stars alone.
+3. Build five research tracks: AI labs, KOL views, papers, open source, and AI x finance. Radar findings can enter whichever track fits best.
+4. Search with English keywords first, then use Chinese sources for local context when configured.
+5. For the KOL views track, run an X-first pass before newsletters: use the handles in `config/kol.yaml`, query `site:x.com/<handle>/status`, `site:x.com/<handle>/article`, public X status/profile pages, configured Gate-News `news_feed_search_x`, X API, or local browser providers, and prefer public X status/profile/article URLs as `items[].url` or `items[].x_src`.
+6. Target at least 60% of KOL-view items with X evidence. If the public/provider path cannot reach that ratio, document the limitation in `dimensions[].notes` and only then fall back to AINews, Latent Space, Interconnects, blogs, or media summaries.
+7. Prefer primary sources: official blogs, research pages, arXiv, GitHub, Hugging Face model cards, project docs, public X status/profile/article pages, reputable media.
+8. Filter aggressively: remove marketing, duplicated reposts, job posts, unverifiable claims, and stale content. Do not drop a high-signal researcher article merely because it is not viral yet.
+9. For longform or research items, set `content_type` and usually `depth: deep`. Include `detail`, `key_points`, `examples`, `product_implications`, and `limitations` so the dashboard is useful without opening the source.
+10. Write a temporary canonical JSON file matching `references/data-schema.md`.
+11. Convert it into dashboard format:
    - `python3 scripts/run_daily.py --date YYYY-MM-DD --from-json /path/to/digest.json --push`
-10. Validate and serve locally.
+12. Validate and serve locally.
 
 ## Scheduling
 
@@ -120,4 +126,5 @@ Push only after the user configures `config/push.yaml` or passes a webhook overr
 
 - `references/data-schema.md` - Digest schema and canonical JSON format.
 - `references/source-providers.md` - Public web, Chrome, extension, API, and fallback provider strategy.
+- `config/research_radar.yaml` - Researcher longform, lab research, Chinese frontier lab, and finance/quant agent radar.
 - `docs/调研方法论与Loop设计.md` - Product and research methodology.

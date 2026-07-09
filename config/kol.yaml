@@ -1,15 +1,15 @@
 # ============================================================
-# KOL 名单 kol.yaml —— 2026-06-29 第三轮：扩到 55 人(约 49 X + 6 国内)，X 一手验证
+# KOL 名单 kol.yaml —— 2026-07-09 第四轮：扩到 59 人，新增研究员长文/国产模型官方监听
 # status: keep(保留) / new(本期新增) / watch(待核实或观察) / drop(建议剔除)
 # platform: X / 微博 / 即刻
 # ============================================================
 meta:
-  version: 3
-  updated: 2026-06-29
-  count: 55
+  version: 4
+  updated: 2026-07-09
+  count: 59
   default_seed: true
   source_priority: "X(一手) > 个人博客/newsletter > 聚合(AINews) > 二手媒体；X 抓取用 Chrome 扩展 + site:x.com"
-  update_rule: "每周体检；新热点出现就从 X 反向发现新声音(如本轮 loop engineering 带出 @bcherny/@steipete/@addyosmani)"
+  update_rule: "每周体检；新热点出现就从 X 反向发现新声音；研究员长文/X Article 进入高优先级巡检"
 
 前沿研究者:
   - { handle: "@karpathy",       name: "Andrej Karpathy",  field: "LLM 教育/agent 思辨", platform: X, status: keep }
@@ -20,6 +20,7 @@ meta:
   - { handle: "@drfeifei",       name: "Fei-Fei Li",       field: "空间智能(World Labs)", platform: X, status: keep }
 
 大厂负责人与研究员:
+  - { handle: "@OpenAI",         name: "OpenAI",           field: "OpenAI 官方研究/产品", platform: X, status: new }
   - { handle: "@sama",           name: "Sam Altman",       field: "OpenAI CEO",         platform: X, status: keep }
   - { handle: "@gdb",            name: "Greg Brockman",    field: "OpenAI 总裁",        platform: X, status: keep }
   - { handle: "@merettm",        name: "Jakub Pachocki",   field: "OpenAI 首席科学家",   platform: X, status: keep }
@@ -30,6 +31,7 @@ meta:
   - { handle: "@miramurati",     name: "Mira Murati",      field: "Thinking Machines",  platform: X, status: watch }
 
 AI工程与Agent:
+  - { handle: "@trq212",         name: "Thariq Shihipar",  field: "Anthropic Claude Code/研究员长文", platform: X, status: new }
   - { handle: "@bcherny",        name: "Boris Cherny",     field: "Claude Code 作者/loop", platform: X, status: new }
   - { handle: "@swyx",           name: "Shawn Wang",       field: "Latent Space/AI 工程", platform: X, status: keep }
   - { handle: "@simonw",         name: "Simon Willison",   field: "agent 安全/prompt injection", platform: X, status: keep }
@@ -43,6 +45,8 @@ AI工程与Agent:
   - { handle: "@jeremyphoward",  name: "Jeremy Howard",    field: "fast.ai/模型评测",    platform: X, status: new }
   - { handle: "@Teknium",        name: "Teknium",          field: "Nous Research",      platform: X, status: new }
   - { handle: "@Zai_org",        name: "Z.ai (智谱)",      field: "GLM 开源模型",        platform: X, status: new }
+  - { handle: "@jietang",        name: "唐杰",             field: "Z.ai/智谱 创始人与 GLM", platform: X, status: new }
+  - { handle: "@Kimi_Moonshot",  name: "Kimi.ai",          field: "Moonshot/Kimi 官方模型更新", platform: X, status: new }
 
 评测与安全:
   - { handle: "@METR_Evals",     name: "METR",             field: "危险能力评测",        platform: X, status: new }

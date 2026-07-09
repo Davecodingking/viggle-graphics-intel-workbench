@@ -57,6 +57,12 @@ The deterministic writer also accepts canonical JSON:
       "why_now": "Why now",
       "buzz": "Community discussion",
       "x_src": ["https://x.com/.../status/..."],
+      "content_type": "news | x_status | x_article | official_research | paper | technical_report | model_card | github_repo | analysis",
+      "depth": "normal | deep",
+      "key_points": ["Point 1", "Point 2"],
+      "examples": ["Concrete example"],
+      "product_implications": ["Product or workflow implication"],
+      "limitations": ["What not to over-infer"],
       "meta": {}
     }
   ],
@@ -71,6 +77,21 @@ The deterministic writer also accepts canonical JSON:
 - Dimension: `key`, `cn`, `overview`
 - Hot topic: `title`, `summary`, `related`
 - Item: `id`, `dim`, `title`, `source`, `url`, `date`, `summary`, `detail`
+
+## Longform / Research Item Expectations
+
+For `content_type` in `x_article`, `official_research`, `paper`, `technical_report`, or `model_card`, set `depth` to `deep` when the source is an important long article or research note.
+
+Deep items should include:
+
+- `summary`: 2-3 plain-language sentences.
+- `detail`: normally 650-1400 Chinese characters for Chinese output. The goal is that the user can understand the article "七七八八" without opening the original.
+- `key_points`: 3-6 bullet-like strings capturing the actual argument, not generic labels.
+- `examples`: 1-3 concrete examples or analogies when the content is abstract.
+- `product_implications`: what this means for AI product, agent engineering, evaluation, open-source adoption, or the configured industry anchors.
+- `limitations`: caveats, uncertainties, or where the author may be overclaiming.
+
+Do not compress a high-value longform item into a short news blurb. If the item is included because of a long article, the dashboard should preserve enough structure to be useful offline.
 
 ## Language
 

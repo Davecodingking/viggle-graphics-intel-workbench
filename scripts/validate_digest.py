@@ -10,6 +10,32 @@ import sys
 from common import ROOT, digest_path_for, extract_latest_from_manifest, read_text, slash_date
 
 
+DEEP_TYPES = {"x_article", "official_research", "paper", "technical_report", "model_card", "long_blog"}
+RESEARCH_DOMAINS = (
+    "anthropic.com/research",
+    "openai.com/research",
+    "alignment.openai.com",
+    "moonshotai.github.io",
+    "huggingface.co/moonshotai",
+    "huggingface.co/deepseek-ai",
+    "github.com/deepseek-ai",
+    "z.ai/blog",
+    "github.com/zai-org",
+    "huggingface.co/zai-org",
+)
+
+
+def active_industry_anchors():
+    path = ROOT / "config" / "industry.yaml"
+    if not path.exists():
+        return []
+    txt = read_text(path)
+    m = re.search(r'(?m)^anchors:\n((?:\s*-\s*[\w-]+\s*\n)+)', txt)
+    if not m:
+        return []
+    return re.findall(r'-\s*([\w-]+)', m.group(1))
+
+
 def load_strict_payload(raw):
     m = re.search(r'window\.__DAILY__\[[^\]]+\]\s*=\s*(\{.*\})\s*;?\s*$', raw, re.S)
     if not m:
@@ -76,6 +102,42 @@ def validate_digest(date_value):
             print("[validate] kol_x_sources=%d/%d (%.0f%%)" % (len(x_kol), len(kol_items), ratio * 100))
             if ratio < 0.5:
                 warnings.append("KOL 维度 X 来源占比偏低：%d/%d；请优先补公开 X status/profile 或 x_src" % (len(x_kol), len(kol_items)))
+
+        deep_items = [
+            item for item in payload.get("items", [])
+            if item.get("depth") == "deep" or item.get("content_type") in DEEP_TYPES
+        ]
+        short_deep = [
+            item for item in deep_items
+            if len(str(item.get("detail") or "")) < 500
+        ]
+        if deep_items:
+            print("[validate] deep_items=%d short_detail=%d" % (len(deep_items), len(short_deep)))
+        for item in short_deep[:5]:
+            warnings.append("深度/长文条目 detail 偏短：%s；请补充 key_points/examples/product_implications/limitations" % item.get("id", "(no-id)"))
+
+        radar_hits = [
+            item for item in payload.get("items", [])
+            if item.get("content_type") in DEEP_TYPES
+            or any(domain in (item.get("url", "") + " " + " ".join(item.get("x_src") or [])) for domain in RESEARCH_DOMAINS)
+        ]
+        print("[validate] research_radar_hits=%d" % len(radar_hits))
+        if not radar_hits:
+            warnings.append("未发现研究雷达命中项：请确认已扫描 config/research_radar.yaml（研究员长文/官方研究页/国产模型论文）")
+
+        anchors = active_industry_anchors()
+        if "ai-finance" in anchors or "ai-crypto" in anchors:
+            finance_oss = []
+            for item in payload.get("items", []):
+                if item.get("dim") != "oss":
+                    continue
+                blob = " ".join(str(item.get(k, "")) for k in ("title", "summary", "detail", "why", "buzz")).lower()
+                blob += " " + " ".join(str(x).lower() for x in item.get("tags") or [])
+                if any(term in blob for term in ("trading", "quant", "financial", "finance", "stock", "backtest", "broker", "exchange", "量化", "投研", "交易", "回测")):
+                    finance_oss.append(item)
+            print("[validate] finance_quant_oss=%d" % len(finance_oss))
+            if len(finance_oss) < 2:
+                warnings.append("当前锚定 AI+金融/加密，但开源项目中金融/量化 Agent 少于 2 条；请补充 X/GitHub 热议项目")
 
     manifest = read_text(ROOT / "data" / "manifest.js")
     if 'latest: "%s"' % key not in manifest and '"%s"' % key not in manifest:

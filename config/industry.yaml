@@ -5,8 +5,8 @@
 #       ③ 额外信源入池 ④ focus 注入调研 agent 的「重点关注」
 # ============================================================
 meta:
-  version: 1
-  updated: 2026-06-29
+  version: 2
+  updated: 2026-07-09
 
 # 当前锚定行业（用户初始化时选择，可多选）—— Wesber 当前：AI+加密、AI+金融
 anchors:
@@ -17,17 +17,17 @@ anchors:
 profiles:
   ai-crypto:
     cn: AI + 加密
-    keywords: [DeFAI, "AI agent on-chain", "crypto AI", "AI trading agent", "AI memecoin", 链上 AI, Virtuals]
+    keywords: [DeFAI, "AI agent on-chain", "crypto AI", "AI trading agent", "AI memecoin", 链上 AI, Virtuals, "autonomous trading agent", "prediction market agent"]
     boost_dimensions: [fin, oss]
-    extra_sources: ["Gate-News(MCP)", "Gate-Info(MCP)", CoinDesk, "The Block", "a16z crypto"]
-    focus: 关注 AI agent 上链、DeFAI、AI 发币、加密交易 agent、链上数据 AI、预测市场
+    extra_sources: ["Gate-News(MCP)", "Gate-Info(MCP)", CoinDesk, "The Block", "a16z crypto", "GitHub Topic AI Trading Agent", "X DeFAI"]
+    focus: 关注 AI agent 上链、DeFAI、AI 发币、加密交易 agent、链上数据 AI、预测市场、交易/套利/风控 agent 开源框架
 
   ai-finance:
     cn: AI + 金融
-    keywords: ["AI 投研", "量化 agent", "券商 Skill", "AI 风控", "AI hedge fund", "AI trading", "stock AI", AI 投顾]
+    keywords: ["AI 投研", "量化 agent", "券商 Skill", "AI 风控", "AI hedge fund", "AI trading", "stock AI", AI 投顾, "financial agent", "LLM quant", "backtesting agent", "portfolio agent"]
     boost_dimensions: [fin, oss]
-    extra_sources: [Bloomberg, 财联社, 上证报, "J.P. Morgan", 券商研报]
-    focus: 关注 AI 投研/量化/选股/风控/对冲基金/券商 AI 产品/交易 agent
+    extra_sources: [Bloomberg, 财联社, 上证报, "J.P. Morgan", 券商研报, "GitHub Topic Quantitative Finance", "X AI trading agent"]
+    focus: 关注 AI 投研/量化/选股/风控/对冲基金/券商 AI 产品/交易 agent；开源项目额外关注金融 Agent、量化 Agent、回测/券商/交易所接口、自动推送与风控闭环
 
   # —— 以下为可选行业模板：开源用户初始化时可锚定 AI+其他行业 ——
   ai-healthcare:

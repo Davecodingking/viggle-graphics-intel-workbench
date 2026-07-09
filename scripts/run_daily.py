@@ -198,14 +198,22 @@ def create_research_prompt(date_value, language_override=None):
 
 执行要求：
 
-1. 读取 `config/industry.yaml`、`config/sources.yaml`、`config/keywords.yaml`、`config/kol.yaml`。
-2. 按五维度调研：AI 大厂动态、KOL 观点、前沿论文、开源项目、AI × 金融。
-3. KOL 观点维度必须执行 X-first 流程：先从 `config/kol.yaml` 取重点 handle，用 `site:x.com/<handle>/status`、公开 X status/profile、已配置的 Gate-News `news_feed_search_x` / X API / 本机 provider 发现近 7 天帖子；目标是 KOL 维度至少 60% 条目来自 X status/profile 或带 `x_src` 的 X 证据。若达不到，必须在 `dimensions[].notes` 写明 provider 限制和 fallback 来源。
-4. 优先英文关键词与一手来源；X/Twitter 只用可访问的公开 status/profile 或用户本地显式配置的 provider，不读取 cookie/token。
-5. 过滤营销、招聘、重复与不可验证信息；保留来源 URL、日期和可信度说明。
-6. 按“产出语言”要求组织 `title`、`summary`、`detail`、`why`、`buzz`、`dimensions.overview`、`hot_topics_today.summary`、`practice_list` 等面向用户字段。
-7. 产出 canonical JSON，字段参考 `skills/daily-intelligence-workbench/references/data-schema.md`。
-8. 写入后运行：
+1. 读取 `config/industry.yaml`、`config/sources.yaml`、`config/keywords.yaml`、`config/kol.yaml`、`config/research_radar.yaml`。
+2. 先执行 `config/research_radar.yaml` 的高优先级雷达，再做普通五维度搜索。雷达必须覆盖：
+   - 研究员长文 / X Articles：尤其 Anthropic Claude Code、OpenAI/alignment 研究员；
+   - 官方研究页：Anthropic Research、OpenAI Research、OpenAI Alignment、Google DeepMind Research；
+   - 国产前沿实验室：DeepSeek、Kimi/Moonshot、Z.ai/GLM、Qwen；检查 official page、Hugging Face model card、GitHub technical report；
+   - 开源金融/量化 Agent：从 X 讨论 + GitHub topics 双入口发现，不只看 stars。
+3. 按五维度调研：AI 大厂动态、KOL 观点、前沿论文、开源项目、AI × 金融。研究雷达发现可进入任一维度。
+4. KOL 观点维度必须执行 X-first 流程：先从 `config/kol.yaml` 取重点 handle，用 `site:x.com/<handle>/status`、`site:x.com/<handle>/article`、公开 X status/profile/article、已配置的 Gate-News `news_feed_search_x` / X API / 本机 provider 发现近 7 天帖子；目标是 KOL 维度至少 60% 条目来自 X status/profile/article 或带 `x_src` 的 X 证据。若达不到，必须在 `dimensions[].notes` 写明 provider 限制和 fallback 来源。
+5. 优先英文关键词与一手来源；X/Twitter 只用可访问的公开 status/profile/article 或用户本地显式配置的 provider，不读取 cookie/token。
+6. 对 DeepSeek、Kimi/Moonshot、智谱/Z.ai、Qwen 的文章、论文、模型卡、GitHub release 提升优先级；即使它们不是当天最大舆论，也要纳入候选池并给出是否入选的判断。
+7. 开源项目额外关注金融 Agent、量化 Agent、AI 投研、回测/券商/交易所接口、自动推送、风控闭环；星少但机制新、X 讨论早期升温的项目可标 `potential=潜力新星`。
+8. 过滤营销、招聘、重复与不可验证信息；保留来源 URL、日期和可信度说明。不要因为高价值研究员长文暂时不够病毒传播就直接丢弃。
+9. 长文/研究项写作规则：若 `content_type` 是 `x_article`、`official_research`、`paper`、`technical_report`、`model_card`，通常设置 `depth=deep`，`detail` 至少约 650 个中文字符，并补充 `key_points`、`examples`、`product_implications`、`limitations`。目标是用户不跳原文也能了解七七八八。
+10. 按“产出语言”要求组织 `title`、`summary`、`detail`、`why`、`buzz`、`dimensions.overview`、`hot_topics_today.summary`、`practice_list` 等面向用户字段。
+11. 产出 canonical JSON，字段参考 `skills/daily-intelligence-workbench/references/data-schema.md`。
+12. 写入后运行：
 
 ```bash
 python3 scripts/run_daily.py --date {date_iso} --from-json <canonical-json-path>

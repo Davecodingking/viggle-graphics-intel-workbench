@@ -4,7 +4,7 @@
 
 AI Intel Workbench is a **local-first, open-source daily intelligence workflow for agents**. It helps Codex, Claude Code, or any skill-capable agent collect and structure daily AI + user-defined industry signals, then review them in a visual local dashboard.
 
-Use it to track AI lab updates, X-first KOL opinions, frontier papers, open-source projects, and AI x finance / crypto / any configured industry. It includes configurable sources, a 55-person default KOL seed list, industry anchors, structured digests, output-language selection, a zero-dependency HTML workbench, optional Lark/Feishu bot pushes, and local scheduled runs.
+Use it to track AI lab updates, X-first KOL opinions, frontier papers, open-source projects, and AI x finance / crypto / any configured industry. It includes configurable sources, a 59-person default KOL seed list, a research radar for researcher longform and lab papers, industry anchors, structured digests, output-language selection, a zero-dependency HTML workbench, optional Lark/Feishu bot pushes, and local scheduled runs.
 
 ![English dashboard](assets/screenshots/dashboard-en.png)
 
@@ -17,6 +17,7 @@ Use it to track AI lab updates, X-first KOL opinions, frontier papers, open-sour
 - Works as a Codex local plugin, a Claude Code repository workflow, or plain local Python scripts.
 - Supports optional Lark/Feishu push bots and local scheduling through macOS LaunchAgent or Linux cron.
 - Uses X-first KOL tracking by default; Gate-News `news_feed_search_x` is the recommended optional dependency for X/Twitter discussion aggregation when available.
+- Runs `config/research_radar.yaml` before generic search to catch researcher X Articles, Anthropic/OpenAI research posts, Chinese frontier-lab model cards, and finance/quant agent repositories.
 
 No personal webhook, cookie, token, API key, or X/Twitter session state is committed by default.
 
@@ -73,6 +74,19 @@ The dashboard UI can also be opened as:
 http://127.0.0.1:4318/?lang=en
 http://127.0.0.1:4318/?lang=zh
 ```
+
+## Research Radar and Deep Summaries
+
+Daily AI research is often published outside ordinary company blogs: researcher X Articles, Anthropic Research, OpenAI Alignment, Hugging Face model cards, GitHub technical reports, or Chinese frontier-lab project pages.
+
+`config/research_radar.yaml` makes these sources first-class:
+
+- `researcher_longform_watchlist`: researcher X Articles and longform posts.
+- `lab_research_watchlist`: Anthropic Research, OpenAI Research, OpenAI Alignment, Google DeepMind Research.
+- `chinese_frontier_lab_watchlist`: DeepSeek, Kimi/Moonshot, Z.ai/GLM, Qwen.
+- `open_source_finance_quant_watchlist`: finance agents, quant agents, AI stock-research agents, backtesting and broker/exchange integrations.
+
+For important longform or research items, agents should set `content_type`, `depth: deep`, `key_points`, `examples`, `product_implications`, and `limitations`. The dashboard is designed to show enough structure that users can understand most of the original article without opening it.
 
 ## Agent Usage
 

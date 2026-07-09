@@ -16,7 +16,9 @@
 
 > 开源默认不内置任何个人 webhook、cookie、token 或账号态。X/Twitter 登录态、API Key、推送机器人都由用户本地自行配置。
 
-> 默认配置已内置 `config/kol.yaml` 作为初始 KOL 池，共 55 人，覆盖 AI 研究者、大厂负责人/研究员、AI 工程与 Agent、开源与模型、评测安全、AI x Crypto 和中文 AI 圈。你可以直接用它启动，也可以按自己的领域增删。
+> 默认配置已内置 `config/kol.yaml` 作为初始 KOL 池，共 59 人，覆盖 AI 研究者、大厂负责人/研究员、AI 工程与 Agent、开源与模型、评测安全、AI x Crypto 和中文 AI 圈。你可以直接用它启动，也可以按自己的领域增删。
+
+> 2026-07-09 起新增 `config/research_radar.yaml`：每日调研会优先扫描研究员 X Article / 长文、Anthropic Research、OpenAI Research / Alignment、DeepSeek、Kimi/Moonshot、Z.ai/智谱、Qwen 等官方研究页、模型卡和技术报告，避免只靠普通新闻或 GitHub Trending 漏掉高价值研究。
 
 ---
 
@@ -33,6 +35,7 @@ ai-intel-workbench/
 │   ├── sources.yaml                       # 信源配置
 │   ├── keywords.yaml                      # 搜索词与噪音过滤
 │   ├── kol.yaml                           # KOL 名单
+│   ├── research_radar.yaml                # 研究员长文/官方研究/国产模型/金融量化 Agent 雷达
 │   ├── push.yaml                          # Lark/飞书等机器人配置
 │   ├── runtime.yaml                       # 本地端口、agent 命令、定时配置
 │   └── secrets.example.env                # 本地密钥示例，不提交真实 secrets
@@ -177,6 +180,32 @@ output_language: zh        # zh | en | bilingual
 ```bash
 python3 scripts/run_daily.py --date today --language en
 ```
+
+## 研究雷达与长文详情
+
+普通热点搜索容易漏掉两类内容：一类是 Anthropic / OpenAI 研究员发在 X Article 或个人账号里的长文，另一类是 DeepSeek、Kimi、智谱等国产实验室发在 Hugging Face / GitHub / 项目页里的模型卡和技术报告。
+
+为了解决这个问题，工作流新增 `config/research_radar.yaml`：
+
+- `researcher_longform_watchlist`：研究员长文/X Article，例如 Anthropic Claude Code 相关研究员。
+- `lab_research_watchlist`：Anthropic Research、OpenAI Research、OpenAI Alignment、Google DeepMind Research。
+- `chinese_frontier_lab_watchlist`：DeepSeek、Kimi/Moonshot、Z.ai/GLM、Qwen。
+- `open_source_finance_quant_watchlist`：金融 Agent、量化 Agent、AI 投研、回测/交易所/券商接口类开源项目。
+
+长文或技术报告入选时，应设置：
+
+```json
+{
+  "content_type": "x_article",
+  "depth": "deep",
+  "key_points": [],
+  "examples": [],
+  "product_implications": [],
+  "limitations": []
+}
+```
+
+`detail` 不再只写短摘要，而应尽量让用户在工作台里了解原文的核心逻辑、案例、价值和边界。
 
 语言含义：
 

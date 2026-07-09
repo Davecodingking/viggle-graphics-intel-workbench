@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI 每日情报工作台</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%234f46e5'/%3E%3Cpath d='M18 33c8-18 20-18 28 0' fill='none' stroke='white' stroke-width='6' stroke-linecap='round'/%3E%3Ccircle cx='32' cy='34' r='6' fill='white'/%3E%3C/svg%3E">
 <script src="data/manifest.js"></script>
 <script src="data/2026/06/29/digest.js"></script>
 <style>
@@ -331,6 +332,8 @@ var P={
   clock:'<circle cx="12" cy="12" r="9.5"/><path d="M12 7v5l3.5 2"/>',
   gear:'<path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z"/><path d="M19.4 13a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V19a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 7 17.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0-1.1-2.7H3a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.7 7l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9.3A1.6 1.6 0 0 0 10.5 3.1V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 2.7 1.1l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8z"/>',
   target:'<circle cx="12" cy="12" r="9.5"/><circle cx="12" cy="12" r="5.5"/><circle cx="12" cy="12" r="1.5"/>',
+  list:'<path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/>',
+  shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-5"/>',
   rocket:'<path d="M5 16c-2 1-2 5-2 5s4 0 5-2c.7-1.4.1-3-1-3-1.1 0-1.7.6-2 0z"/><path d="M9 13l-3-3a14 14 0 0 1 9-9c3 0 5 2 5 5a14 14 0 0 1-9 9z"/><circle cx="14.5" cy="9.5" r="1.5"/>',
   open:'<path d="M9 18h6"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.2 1 2.5h6c0-1.3.3-1.8 1-2.5A6 6 0 0 0 12 3z"/>',
   book:'<path d="M4 19V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19a2 2 0 0 1 2-2h13"/>'
@@ -674,6 +677,10 @@ function itemModalHTML(date,id,hasBack){
   var b="";
   b+=blk("","grid","小白速览",it.summary);
   if(it.detail)b+=blk("detail","book","详细版",it.detail);
+  if(it.key_points&&it.key_points.length)b+=listBlk("detail","list","关键要点",it.key_points);
+  if(it.examples&&it.examples.length)b+=listBlk("ex","bulb","例子 / 场景",it.examples);
+  if(it.product_implications&&it.product_implications.length)b+=listBlk("why","star","产品启发",it.product_implications);
+  if(it.limitations&&it.limitations.length)b+=listBlk("","shield","边界 / 不要过度外推",it.limitations);
   if(it.why_now)b+=blk("now","refresh","为什么现在火",it.why_now);
   if(it.why)b+=blk("why","star","为什么值得关注",it.why);
   if(mt.novelty)b+=blk("","bulb","核心创新",mt.novelty);
@@ -702,6 +709,10 @@ function itemModalHTML(date,id,hasBack){
       '</div></div>';
 }
 function blk(cls,icn,label,body){return '<div class="blk '+cls+'"><div class="bl">'+ico(icn)+esc(label)+'</div><div class="bd">'+esc(body)+'</div></div>';}
+function listBlk(cls,icn,label,arr){
+  var body='<ul class="ul" style="margin:0">'+(arr||[]).map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul>';
+  return '<div class="blk '+cls+'"><div class="bl">'+ico(icn)+esc(label)+'</div><div class="bd">'+body+'</div></div>';
+}
 
 function hotModalHTML(i,hasBack){
   var d=daily(),ht=(d.hot_topics_today||[])[i];if(!ht)return "";
