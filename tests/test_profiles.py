@@ -10,12 +10,14 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from profiles import active_profile_id, available_profiles, load_profile  # noqa: E402
 import run_daily  # noqa: E402
+import common  # noqa: E402
+import validate_digest as validator  # noqa: E402
 from run_daily import merge_dimensions  # noqa: E402
 
 
 class ProfileTests(unittest.TestCase):
     def test_profiles_are_discoverable(self):
-        self.assertEqual(available_profiles(), ["general-ai", "viggle-graphics"])
+        self.assertEqual(available_profiles(), ["general-ai", "investing-markets", "viggle-graphics"])
 
     def test_cli_override_precedes_runtime(self):
         self.assertEqual(
@@ -58,11 +60,45 @@ class ProfileTests(unittest.TestCase):
                     encoding="utf-8",
                 )
                 run_daily.update_manifest("2026-07-20", 8, "viggle-graphics")
+                run_daily.update_manifest("2026-07-20", 12, "investing-markets")
                 output = manifest.read_text(encoding="utf-8")
                 self.assertIn('profile: "general-ai"', output)
                 self.assertIn('profile: "viggle-graphics"', output)
+                self.assertIn('profile: "investing-markets"', output)
+                self.assertIn('data/2026/07/20/viggle-graphics/digest.js', output)
+                self.assertIn('data/2026/07/20/investing-markets/digest.js', output)
+                self.assertEqual(output.count('date: "2026/07/20"'), 2)
         finally:
             run_daily.ROOT = original_root
+
+    def test_two_profiles_can_share_one_date_and_validate(self):
+        original_common_root = common.ROOT
+        original_run_root = run_daily.ROOT
+        original_validate_root = validator.ROOT
+        try:
+            with tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                common.ROOT = root
+                run_daily.ROOT = root
+                validator.ROOT = root
+                run_daily.write_digest_from_json(
+                    "2026-07-20", ROOT / "tests" / "fixtures" / "viggle_digest.json",
+                    profile_override="viggle-graphics",
+                )
+                run_daily.write_digest_from_json(
+                    "2026-07-20", ROOT / "tests" / "fixtures" / "investing_digest.json",
+                    profile_override="investing-markets",
+                )
+                self.assertTrue((root / "data/2026/07/20/viggle-graphics/digest.js").exists())
+                self.assertTrue((root / "data/2026/07/20/investing-markets/digest.js").exists())
+                manifest = (root / "data/manifest.js").read_text(encoding="utf-8")
+                self.assertEqual(manifest.count('date: "2026/07/20"'), 2)
+                self.assertEqual(validator.validate_digest("2026-07-20", "viggle-graphics"), 0)
+                self.assertEqual(validator.validate_digest("2026-07-20", "investing-markets"), 0)
+        finally:
+            common.ROOT = original_common_root
+            run_daily.ROOT = original_run_root
+            validator.ROOT = original_validate_root
 
 
 if __name__ == "__main__":

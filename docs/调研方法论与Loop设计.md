@@ -17,7 +17,7 @@
 
 ## 二、Profile 与主题维度
 
-工作台用 profile 隔离不同研究目标。解析顺序是 CLI `--profile` → `config/runtime.yaml` 的 `active_profile` → `general-ai` 兼容默认；v1 一次只生成一个 profile 的 digest。
+工作台用 profile 隔离不同研究目标。解析顺序是 CLI `--profile` → `config/runtime.yaml` 的 `active_profile` → `general-ai` 兼容默认；单次命令生成一个 profile，周任务可顺序检查并补齐 `viggle-graphics`、`general-ai`、`investing-markets` 三份简报。
 
 默认 `viggle-graphics` 采用五个主题：视频生成与人物动画、图形学与 3D/4D、推理系统/GPU/Pipeline、评测/数据/安全、开源/产品/产业生态。论文是跨主题 `content_type`：视频论文进入 `video`，渲染或 Gaussian Splatting 论文进入 `graphics`，推理与调度论文进入 `systems`，再由 Papers 筛选聚合查看。
 
@@ -86,7 +86,7 @@
 
 1. **触发**：发起当日调研（或定时自动）。
 2. **采集 + 清洗**：按 profile 主题联网调研，返回结构化结果（含来源、日期、可信度、相关性、影响和下一步动作）。
-3. **落盘**：写 `data/年/月/日/raw/*.json`（原始）+ `digest.js`（清洗后）+ `manifest.js` 追加一条。
+3. **落盘**：写 `data/年/月/日/<profile>/digest.js`（清洗后）并在 `manifest.js` 追加一条；同日多 profile 不互相覆盖，旧日期根目录 digest 继续兼容。
 4. **查看**：打开 `index.html` → 今日速览（动态主题 + 跨维度热点 + 内容类型筛选）。
 5. **标记**：感兴趣的 ⭐；想深挖的论文/项目点原文链接。
 6. **（每周）复盘**：看「⭐我的标记」分布 → 据此更新 `config/*.yaml`。

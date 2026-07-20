@@ -65,6 +65,28 @@ class ValidationTests(unittest.TestCase):
     def test_legacy_digest_still_validates(self):
         self.assertEqual(validate_digest("2026-06-29", "general-ai"), 0)
 
+    def test_investing_fixture_covers_three_markets_and_decision_fields(self):
+        profile = load_profile("investing-markets")
+        payload = json.loads((ROOT / "tests" / "fixtures" / "investing_digest.json").read_text())
+        payload["dimensions"] = merge_dimensions(payload["dimensions"], profile)
+        errors, warnings = [], []
+        _validate_strict_payload(payload, profile, errors, warnings)
+        self.assertEqual(errors, [])
+        self.assertEqual(warnings, [])
+        self.assertEqual(
+            {item["meta"]["market"] for item in payload["items"]} & {"A股", "港股", "美股"},
+            {"A股", "港股", "美股"},
+        )
+
+    def test_investing_fixture_requires_invalidation(self):
+        profile = load_profile("investing-markets")
+        payload = json.loads((ROOT / "tests" / "fixtures" / "investing_digest.json").read_text())
+        payload["dimensions"] = merge_dimensions(payload["dimensions"], profile)
+        payload["items"][0].pop("invalidation")
+        errors, warnings = [], []
+        _validate_strict_payload(payload, profile, errors, warnings)
+        self.assertTrue(any("缺少 invalidation" in error for error in errors))
+
 
 if __name__ == "__main__":
     unittest.main()

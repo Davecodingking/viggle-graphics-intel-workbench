@@ -40,12 +40,72 @@ def slash_date(value):
     return normalize_date(value).replace("-", "/")
 
 
-def digest_path_for(date_value):
-    return ROOT / "data" / slash_date(date_value) / "digest.js"
+def digest_path_for(date_value, profile_id=None):
+    """Return a digest path.
+
+    Legacy digests live directly under the date folder. New profile-aware
+    digests use a profile subfolder so several profiles can share one date.
+    """
+    base = ROOT / "data" / slash_date(date_value)
+    return base / profile_id / "digest.js" if profile_id else base / "digest.js"
 
 
 def manifest_path():
     return ROOT / "data" / "manifest.js"
+
+
+def manifest_entries():
+    """Read the small JavaScript manifest with the standard library only."""
+    path = manifest_path()
+    if not path.exists():
+        return []
+    entries = []
+    for match in re.finditer(r"\{([^{}]+)\}", read_text(path)):
+        block = match.group(1)
+        fields = {}
+        for name in ("date", "label", "file", "profile"):
+            value = re.search(r'%s:\s*"([^"]+)"' % name, block)
+            if value:
+                fields[name] = value.group(1)
+        count = re.search(r"count:\s*(\d+)", block)
+        if fields.get("date") and fields.get("file") and count:
+            fields["count"] = int(count.group(1))
+            fields.setdefault("label", fields["date"])
+            fields.setdefault("profile", "general-ai")
+            entries.append(fields)
+    return entries
+
+
+def manifest_entry(date_value=None, profile_id=None):
+    entries = manifest_entries()
+    if date_value and date_value != "latest":
+        key = slash_date(date_value)
+        entries = [entry for entry in entries if entry["date"] == key]
+    if profile_id:
+        entries = [entry for entry in entries if entry["profile"] == profile_id]
+    return entries[-1] if entries else None
+
+
+def existing_digest_path(date_value, profile_id=None):
+    """Resolve manifest-backed data first, then new and legacy locations."""
+    entry = manifest_entry(date_value, profile_id)
+    if entry:
+        path = ROOT / entry["file"]
+        if path.exists():
+            return path
+    if profile_id:
+        path = digest_path_for(date_value, profile_id)
+        if path.exists():
+            return path
+    path = digest_path_for(date_value)
+    if not path.exists():
+        return None
+    if not profile_id:
+        return path
+    raw = read_text(path)
+    embedded = re.search(r'(?:(?:"profile")|profile)\s*:\s*"([^"]+)"', raw)
+    embedded_profile = embedded.group(1) if embedded else "general-ai"
+    return path if embedded_profile == profile_id else None
 
 
 def parse_simple_yaml(path):
@@ -85,7 +145,10 @@ def date_label(date_value):
     return dt.strftime("%Y年%m月%d日")
 
 
-def extract_latest_from_manifest():
+def extract_latest_from_manifest(profile_id=None):
+    if profile_id:
+        entry = manifest_entry("latest", profile_id)
+        return entry["date"] if entry else None
     path = manifest_path()
     if not path.exists():
         return None

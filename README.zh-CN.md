@@ -4,7 +4,7 @@
 
 本项目是一个**本地优先、可开源安装部署**的每日 AI 行业情报工作台。它把配置化信源、X-first KOL 追踪、行业锚定、Agent 调研、结构化 digest、本地 HTML 工作台、机器人推送和本地定时任务串成一套可复用流程。
 
-当前默认启用 `viggle-graphics` profile，面向视频生成、人物动画、图形学与 3D/4D、推理系统/GPU Pipeline、评测安全和产业生态。原作者的泛 AI 工作流完整保留为 `general-ai`，原有 sources、keywords、KOL 和 radar 配置不删不改。
+当前默认启用 `viggle-graphics` profile，面向视频生成、人物动画、图形学与 3D/4D、推理系统/GPU Pipeline、评测安全和产业生态。原作者的泛 AI 工作流完整保留为 `general-ai`，原有 sources、keywords、KOL 和 radar 配置不删不改。另有独立的 `investing-markets`，覆盖 A 股、港股和美股的公告优先型投资研究。
 
 只要你的 Agent 具备读取 skill/说明文档、运行本地脚本、设置或触发定时任务的能力，就可以使用这个仓库完成初始化、每日调研、看板更新和可选机器人推送。
 
@@ -42,6 +42,7 @@ ai-intel-workbench/
 │   ├── runtime.yaml                       # 本地端口、agent 命令、定时配置
 │   ├── profiles/general-ai/profile.json   # 原作者工作流映射
 │   ├── profiles/viggle-graphics/          # Viggle 图形学 profile 与独立 YAML 配置
+│   ├── profiles/investing-markets/         # A 股/港股/美股投资研究 profile
 │   └── secrets.example.env                # 本地密钥示例，不提交真实 secrets
 ├── data/
 │   ├── manifest.js                        # 历史 digest 清单
@@ -73,6 +74,9 @@ python3 scripts/init.py --profile viggle-graphics
 # 临时切回原作者工作流；只有该 profile 使用行业 anchors
 python3 scripts/init.py --profile general-ai --anchors ai-crypto,ai-finance --language zh --bot none
 
+# 使用独立的投资与股票 profile
+python3 scripts/init.py --profile investing-markets --language zh --bot none
+
 # 2. 打开本地工作台
 python3 scripts/serve.py --port 4318
 # 浏览器访问 http://127.0.0.1:4318/
@@ -96,7 +100,9 @@ python3 scripts/run_daily.py --date today --profile viggle-graphics
 
 Profile 解析顺序为：CLI `--profile` → `config/runtime.yaml` 的 `active_profile` → `general-ai` 兼容默认。v1 每次只运行一个 profile。
 
-网页顶部可在“图形学”和“原版 AI＋金融”之间切换。切换后会打开该 profile 的最新 digest，并将历史归档、近期高频和收藏范围限定到当前 profile。`data/manifest.js` 的每个日期记录都带有 `profile`；没有该字段的旧记录自动按 `general-ai` 读取。
+网页顶部可在“图形学”“原版 AI＋金融”和“投资与股票”之间切换。切换后会打开该 profile 的最新 digest，并将历史归档、近期高频和收藏范围限定到当前 profile。`data/manifest.js` 的每条记录都带有 `profile`；没有该字段的旧记录自动按 `general-ai` 读取。新数据写入 `data/年/月/日/<profile>/digest.js`，因此同一天可以保存三份简报，旧路径继续兼容。
+
+`investing-markets` 使用市场与宏观、公司与基本面、财报/公告/催化剂、估值与情景、风险与组合五个维度。它优先读取巨潮资讯/交易所、HKEXnews、SEC EDGAR、公司 IR、央行和统计机构，输出逻辑、证据、风险、证伪条件与观察触发器；不自动下单，也不构成个性化投资建议。
 
 原版的“AI × 金融”并不是普通荐股栏目。它关注 AI 如何进入投研、量化、交易、支付、风控和监管，也观察芯片、算力与 AI 产品变化如何传导到上市公司和市场。默认保留原作者的栏目和来源结构，内容只用于技术与产业情报，不构成投资建议。
 
@@ -458,11 +464,13 @@ output_language: zh
 
 ## 数据契约
 
-每日 digest 写入：
+新版 digest 按 Profile 写入，同一天可同时保存三份：
 
 ```text
-data/YYYY/MM/DD/digest.js
+data/YYYY/MM/DD/<profile-id>/digest.js
 ```
+
+历史 `data/YYYY/MM/DD/digest.js` 仍可直接读取，无需迁移。
 
 并更新：
 

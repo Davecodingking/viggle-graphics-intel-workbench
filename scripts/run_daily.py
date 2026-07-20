@@ -21,6 +21,7 @@ from common import (
     ROOT,
     date_label,
     digest_path_for,
+    existing_digest_path,
     js_string,
     load_json,
     normalize_date,
@@ -89,7 +90,7 @@ def merge_dimensions(payload_dimensions, profile):
 
 def write_digest_from_json(date_value, json_path, language_override=None, profile_override=None):
     date_iso = normalize_date(date_value)
-    key = slash_date(date_iso)
+    date_key = slash_date(date_iso)
     cfg = runtime_config()
     language = (language_override or cfg.get("output_language") or "zh").strip()
     if language not in LANGUAGE_INSTRUCTIONS:
@@ -114,20 +115,21 @@ def write_digest_from_json(date_value, json_path, language_override=None, profil
     payload.setdefault("practice_list", [])
     payload = apply_persistent_config(payload, profile)
 
-    out = digest_path_for(date_iso)
+    storage_key = "%s::%s" % (date_key, profile["id"])
+    out = digest_path_for(date_iso, profile["id"])
     text = [
         "// 当日聚合数据（由 Daily Intelligence Workbench 生成）。",
         "window.__DAILY__ = window.__DAILY__ || {};",
-        'window.__DAILY__[%s] = %s;' % (js_string(key), js_value(payload, indent=2)),
+        'window.__DAILY__[%s] = %s;' % (js_string(storage_key), js_value(payload, indent=2)),
         "",
     ]
     write_text(out, "\n".join(text))
-    update_manifest(date_iso, len(payload.get("items", [])), profile["id"])
+    update_manifest(date_iso, len(payload.get("items", [])), profile["id"], out)
     print("[run] 已写入", out)
     return out
 
 
-def update_manifest(date_value, count, profile_id="general-ai"):
+def update_manifest(date_value, count, profile_id="general-ai", output_path=None):
     date_iso = normalize_date(date_value)
     key = slash_date(date_iso)
     manifest = ROOT / "data" / "manifest.js"
@@ -152,15 +154,17 @@ def update_manifest(date_value, count, profile_id="general-ai"):
                 "file": file_match.group(1),
                 "profile": profile_match.group(1) if profile_match else "general-ai",
             })
-    entries = [e for e in entries if e["date"] != key]
+    entries = [e for e in entries if not (e["date"] == key and e.get("profile", "general-ai") == profile_id)]
+    output_path = output_path or (ROOT / "data" / key / profile_id / "digest.js")
+    relative_path = output_path.relative_to(ROOT).as_posix()
     entries.append({
         "date": key,
         "label": date_label(date_iso),
         "count": int(count),
-        "file": "data/%s/digest.js" % key,
+        "file": relative_path,
         "profile": profile_id,
     })
-    entries.sort(key=lambda e: e["date"])
+    entries.sort(key=lambda e: (e["date"], e.get("profile", "general-ai")))
     latest = entries[-1]["date"]
     body = ",\n".join(
         '    { date: "%s", label: "%s", count: %d, file: "%s", profile: "%s" }' %
@@ -197,7 +201,7 @@ def copy_sample(date_value, sample_date):
     raw = raw.replace('generated_at: "%s"' % normalize_date(sample_date), 'generated_at: "%s"' % date_iso)
     write_text(dst, raw)
     item_count = len(__import__("re").findall(r'\bid\s*:\s*"([^"]+)"', raw))
-    update_manifest(date_iso, item_count, "general-ai")
+    update_manifest(date_iso, item_count, "general-ai", dst)
     print("[run] 已复制样例 %s -> %s" % (old_key, new_key))
 
 
@@ -212,7 +216,7 @@ def create_research_prompt(date_value, language_override=None, profile_override=
     except ValueError as exc:
         raise SystemExit(str(exc))
     language_instruction = LANGUAGE_INSTRUCTIONS[language]
-    run_dir = ROOT / ".daily-intel" / "runs" / date_iso
+    run_dir = ROOT / ".daily-intel" / "runs" / date_iso / profile["id"]
     prompt_path = run_dir / "research_prompt.md"
     dimensions = "\n".join(
         "- `{key}`: {cn} / {en}".format(**dim)
@@ -222,6 +226,19 @@ def create_research_prompt(date_value, language_override=None, profile_override=
         "%d. %s" % (index, instruction)
         for index, instruction in enumerate(profile.get("research_instructions") or [], 1)
     )
+    if profile["id"] == "viggle-graphics":
+        domain_requirements = (
+            "论文或技术报告在 `meta.venue` 或 `meta.arxiv_id` 中保留身份信息，并填写 "
+            "`method/evidence/viggle_relation/limitations/experiment`。"
+        )
+    elif profile["id"] == "investing-markets":
+        domain_requirements = (
+            "投资条目必须填写 `meta.market`、`meta.source_tier`，公司条目填写 `meta.ticker`；"
+            "同时填写 `thesis/evidence/limitations 或 risks/invalidation/watch_trigger`，"
+            "明确区分事实、推断与待验证假设。不得给出保证收益或自动交易指令。"
+        )
+    else:
+        domain_requirements = "重要研究条目应写清一手证据、限制与下一步验证。"
     prompt = """# Daily Intelligence Research Task
 
 日期：{date_iso}
@@ -246,9 +263,9 @@ Profile 规则：
 1. 先读 profile.json 与上述配置文件，先跑 radar，再按 sources 与 keywords 搜索。
 2. 英文关键词优先；主 URL 优先使用顶会、期刊、arXiv、官方研究页、项目页、GitHub 或 Hugging Face。社媒主要用于发现和讨论证据。
 3. 过滤营销、招聘、重复、不可验证与超时间窗口内容；每条保留 URL、日期和可信度备注。
-4. 每个 item 的 `dim` 必须来自当前维度；`content_type` 使用 `paper/technical_report/model_card/github_repo/news/x_status/x_article/official_research/analysis`。
-5. 每个 item 填写 `relevance`（direct/transferable/systems/watch）、`impact` 数组、`next_action`（deep_read/reproduce/prototype/watch）；可验证时填写 `experiment`。
-6. 论文或技术报告在 `meta.venue` 或 `meta.arxiv_id` 中保留身份信息，并填写 `method/evidence/viggle_relation/limitations/experiment`，写清方法、证据、局限、与 Viggle 的关系和最小实验。
+4. 每个 item 的 `dim` 必须来自当前维度；`content_type` 使用 schema 与当前 profile 允许的值。
+5. 每个 item 填写当前 profile 规定的 `relevance`、`impact` 数组与 `next_action`；可验证时填写 `experiment`。
+6. {domain_requirements}
 7. 重要研究项通常设置 `depth=deep`，中文 detail 目标 650-1400 字，并补 `key_points/examples/product_implications/limitations`。
 8. 产出 canonical JSON，字段参考 `skills/daily-intelligence-workbench/references/data-schema.md`，根字段写 `profile: {profile_id}`。
 9. 写入后运行：
@@ -261,7 +278,7 @@ python3 scripts/validate_digest.py --date {date_iso} --profile {profile_id}
 可选：
 
 ```bash
-python3 scripts/push_lark.py
+python3 scripts/push_lark.py {date_iso} --profile {profile_id}
 ```
 """.format(
         date_iso=date_iso,
@@ -273,6 +290,7 @@ python3 scripts/push_lark.py
         config_lines=profile_config_lines(profile),
         dimensions=dimensions,
         instructions=instructions,
+        domain_requirements=domain_requirements,
     )
     write_text(prompt_path, prompt)
     print("[run] 已生成 agent 调研提示:", prompt_path)
@@ -299,7 +317,7 @@ def maybe_run_agent(date_value, prompt_path):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--date", default="today", help="YYYY-MM-DD, YYYY/MM/DD, or today")
-    parser.add_argument("--from-json", help="Canonical digest JSON to write into data/YYYY/MM/DD/digest.js")
+    parser.add_argument("--from-json", help="Canonical digest JSON to write into data/YYYY/MM/DD/<profile>/digest.js")
     parser.add_argument("--sample", action="store_true", help="Copy bundled sample data for a smoke run")
     parser.add_argument("--sample-date", default="2026-06-29", help="Sample date to copy when --sample is used")
     parser.add_argument("--push", action="store_true", help="Push after successful validation")
@@ -318,19 +336,19 @@ def main():
         write_digest_from_json(date_iso, args.from_json, args.language, profile["id"])
     elif args.sample:
         if profile["id"] != "general-ai":
-            raise SystemExit("[run] 内置 --sample 属于 general-ai；Viggle 样例请使用 tests/fixtures/viggle_digest.json")
+            raise SystemExit("[run] 内置 --sample 属于 general-ai；其它 profile 的结构样例位于 tests/fixtures/")
         copy_sample(date_iso, args.sample_date)
-    elif digest_path_for(date_iso).exists():
-        print("[run] 当日 digest 已存在:", digest_path_for(date_iso))
+    elif existing_digest_path(date_iso, profile["id"]):
+        print("[run] 当日 digest 已存在:", existing_digest_path(date_iso, profile["id"]))
     else:
         prompt_path = create_research_prompt(date_iso, args.language, profile["id"])
         rc = maybe_run_agent(date_iso, prompt_path)
         if rc != 0:
             sys.exit(rc)
-        if not digest_path_for(date_iso).exists() and args.strict:
-            raise SystemExit("[run] 未生成 digest: %s" % digest_path_for(date_iso))
+        if not existing_digest_path(date_iso, profile["id"]) and args.strict:
+            raise SystemExit("[run] 未生成 digest: %s" % digest_path_for(date_iso, profile["id"]))
 
-    if digest_path_for(date_iso).exists():
+    if existing_digest_path(date_iso, profile["id"]):
         rc = subprocess.call([
             sys.executable, "scripts/validate_digest.py", "--date", date_iso,
             "--profile", profile["id"],
@@ -338,7 +356,10 @@ def main():
         if rc != 0:
             sys.exit(rc)
         if args.push:
-            sys.exit(subprocess.call([sys.executable, "scripts/push_lark.py"], cwd=str(ROOT)))
+            sys.exit(subprocess.call([
+                sys.executable, "scripts/push_lark.py", date_iso,
+                "--profile", profile["id"],
+            ], cwd=str(ROOT)))
     return 0
 
 

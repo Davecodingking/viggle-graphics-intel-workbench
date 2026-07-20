@@ -294,6 +294,7 @@
       <div class="seg profileseg" id="profileseg" aria-label="Profile">
         <button data-profile="viggle-graphics" onclick="setProfile('viggle-graphics')">图形学</button>
         <button data-profile="general-ai" onclick="setProfile('general-ai')">原版 AI＋金融</button>
+        <button data-profile="investing-markets" onclick="setProfile('investing-markets')">投资与股票</button>
       </div>
       <div class="grow"></div>
       <label class="search"><svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="q" placeholder="搜索标题 / 摘要 / 标签…" oninput="onSearch(this.value)"></label>
@@ -374,9 +375,10 @@ var I18N={
     only_days:"目前仅有",need_days:"天数据，跨天高频需累积 ≥ 2 天后自动生效。今日标签热度 Top：",
     kol_watch:"KOL 关注名单",kol_config:"可在 config/kol.yaml 维护",people:"人",x_accounts:"个 X 账号",domestic:"其余国内(微博/即刻)",practice:"今日可借鉴实践",hot_discussions:"热门讨论议题",
     ai_trading:"AI+交易",filter_all:"全部类型",filter_papers:"论文",filter_reports:"技术报告",filter_repos:"仓库 / 模型",filter_news:"资讯 / 分析",filter_kol:"KOL / 长文",
-    venue:"发表/来源",arxiv:"arXiv",relevance:"相关性",impact:"影响",next_action:"下一步",experiment:"建议实验",method:"方法",evidence:"证据",viggle_relation:"与 Viggle 的关系",profile:"当前 Profile",
-    profile_graphics:"图形学",profile_general:"原版 AI＋金融",profile_empty:"这个 Profile 还没有归档数据。",
-    finance_explain:"“AI × 金融”不是普通荐股栏目：它追踪 AI 如何进入投研、量化、交易、支付、风控与监管，也关注芯片、算力和 AI 产品变化如何传导到上市公司与市场。保留原作者栏目结构，仅作技术与产业情报，不构成投资建议。"
+    venue:"发表/来源",arxiv:"arXiv",relevance:"相关性",impact:"影响",next_action:"下一步",experiment:"建议实验",method:"方法",evidence:"证据",viggle_relation:"与 Viggle 的关系",profile:"当前 Profile",thesis:"投资逻辑",risks:"主要风险",invalidation:"证伪条件",watch_trigger:"观察触发器",market:"市场",ticker:"代码",source_tier:"证据层级",
+    profile_graphics:"图形学",profile_general:"原版 AI＋金融",profile_investing:"投资与股票",profile_empty:"这个 Profile 还没有归档数据。",
+    finance_explain:"“AI × 金融”不是普通荐股栏目：它追踪 AI 如何进入投研、量化、交易、支付、风控与监管，也关注芯片、算力和 AI 产品变化如何传导到上市公司与市场。保留原作者栏目结构，仅作技术与产业情报，不构成投资建议。",
+    investing_explain:"“投资与股票”覆盖 A 股、港股和美股，优先使用监管、交易所、公司公告与财报，输出投资逻辑、证据、风险、证伪条件和观察触发器。它用于辅助研究，不构成个性化投资建议，也不会自动下单。"
   },
   en:{
     doc_title:"AI Intel Workbench",brand:"AI Intel Workbench",brand_sub:"DAILY INTELLIGENCE",
@@ -395,9 +397,10 @@ var I18N={
     only_days:"Only",need_days:"days of data so far. Cross-day trends activate after 2+ days. Today's top tags:",
     kol_watch:"KOL Watchlist",kol_config:"Maintained in config/kol.yaml",people:"people",x_accounts:"X accounts",domestic:"others on domestic platforms",practice:"Practices to Borrow",hot_discussions:"Hot Discussion Topics",
     ai_trading:"AI trading",filter_all:"All content",filter_papers:"Papers",filter_reports:"Technical reports",filter_repos:"Repos / models",filter_news:"News / analysis",filter_kol:"KOL / longform",
-    venue:"Venue",arxiv:"arXiv",relevance:"Relevance",impact:"Impact",next_action:"Next action",experiment:"Suggested experiment",method:"Method",evidence:"Evidence",viggle_relation:"Relevance to Viggle",profile:"Profile",
-    profile_graphics:"Graphics",profile_general:"Original AI + Finance",profile_empty:"This profile has no archived digest yet.",
-    finance_explain:"AI x Finance is not a stock-picking feed. It tracks how AI changes research, quant workflows, trading, payments, risk and regulation, plus how chips, compute and AI products flow through to public companies and markets. The original structure is preserved for technical and industry intelligence only, not investment advice."
+    venue:"Venue",arxiv:"arXiv",relevance:"Relevance",impact:"Impact",next_action:"Next action",experiment:"Suggested experiment",method:"Method",evidence:"Evidence",viggle_relation:"Relevance to Viggle",profile:"Profile",thesis:"Investment thesis",risks:"Key risks",invalidation:"Invalidation",watch_trigger:"Watch trigger",market:"Market",ticker:"Ticker",source_tier:"Evidence tier",
+    profile_graphics:"Graphics",profile_general:"Original AI + Finance",profile_investing:"Investing & Stocks",profile_empty:"This profile has no archived digest yet.",
+    finance_explain:"AI x Finance is not a stock-picking feed. It tracks how AI changes research, quant workflows, trading, payments, risk and regulation, plus how chips, compute and AI products flow through to public companies and markets. The original structure is preserved for technical and industry intelligence only, not investment advice.",
+    investing_explain:"Investing & Stocks covers A-shares, Hong Kong and U.S. equities. It prioritizes regulatory, exchange and company filings and records the thesis, evidence, risks, invalidation conditions and watch triggers. It supports research, is not personalized investment advice and never places trades."
   }
 };
 function T(k){return (I18N[UI_LANG]&&I18N[UI_LANG][k])||I18N.zh[k]||k;}
@@ -414,7 +417,8 @@ function applyLangShell(){
   }
   document.querySelectorAll("#langseg button").forEach(function(b){b.classList.toggle("on",b.dataset.lang===UI_LANG);});
   document.querySelectorAll("#profileseg button").forEach(function(b){
-    b.textContent=b.dataset.profile==="viggle-graphics"?T("profile_graphics"):T("profile_general");
+    var labels={"viggle-graphics":"profile_graphics","general-ai":"profile_general","investing-markets":"profile_investing"};
+    b.textContent=T(labels[b.dataset.profile]||b.dataset.profile);
     b.classList.toggle("on",b.dataset.profile===state.profile);
   });
   var sf=document.querySelector(".side-foot");if(sf)sf.innerHTML=T("data_dir")+' <b>data/</b><br><span id="footdate"></span>';
@@ -447,33 +451,42 @@ function dimMeta(d,key){
 }
 function syncDims(d){DIM={};dimsFor(d).forEach(function(raw){DIM[raw.key]=dimMeta(d,raw.key);});}
 var MANIFEST=window.__MANIFEST__||{dates:[]};
-var PROFILE_IDS=["viggle-graphics","general-ai"];
+var PROFILE_IDS=["viggle-graphics","general-ai","investing-markets"];
 var PROFILE_KEY="ai_daily_profile_v1";
 function entryProfile(entry){return (entry&&entry.profile)||"general-ai";}
 function profileDates(profile){return (MANIFEST.dates||[]).filter(function(entry){return entryProfile(entry)===profile;});}
 function latestProfileDate(profile){var dates=profileDates(profile);return dates.length?dates[dates.length-1].date:null;}
-function profileForDate(date){var entry=(MANIFEST.dates||[]).filter(function(row){return row.date===date;})[0];return entryProfile(entry);}
+function manifestEntry(date,profile){
+  var rows=(MANIFEST.dates||[]).filter(function(row){return row.date===date&&(!profile||entryProfile(row)===profile);});
+  return rows.length?rows[rows.length-1]:null;
+}
+function profileForDate(date,preferred){var entry=manifestEntry(date,preferred)||manifestEntry(date);return entryProfile(entry);}
 var requestedProfile=(new URLSearchParams(location.search).get("profile")||localStorage.getItem(PROFILE_KEY)||"").toLowerCase();
-if(PROFILE_IDS.indexOf(requestedProfile)<0)requestedProfile=profileForDate(MANIFEST.latest);
+if(PROFILE_IDS.indexOf(requestedProfile)<0)requestedProfile=profileForDate(MANIFEST.latest,"viggle-graphics");
 if(PROFILE_IDS.indexOf(requestedProfile)<0)requestedProfile="viggle-graphics";
 var state={profile:requestedProfile,date:latestProfileDate(requestedProfile)||MANIFEST.latest,view:"overview",q:"",heat:"all",type:"all"};
 var MK="ai_daily_marks_v2";
 var modalStack=[];
 
-function daily(d){var k=d||state.date,db=window.__DAILY__||{};return (UI_LANG==="en"&&(db[k+"#en"]))||db[k];}
+function daily(d,p){
+  var k=d||state.date,profile=p||state.profile,db=window.__DAILY__||{},base=k+"::"+profile;
+  var value=(UI_LANG==="en"&&(db[base+"#en"]||db[k+"#en"]))||db[base]||db[k];
+  return value&&((value.profile||"general-ai")===profile)?value:null;
+}
 function esc(s){return (s==null?"":String(s)).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 function getMarks(){try{return JSON.parse(localStorage.getItem(MK)||"{}")}catch(e){return{}}}
 function setMarks(m){localStorage.setItem(MK,JSON.stringify(m));}
-function mkKey(date,id){return date+"::"+id;}
-function isMarked(date,id){return !!getMarks()[mkKey(date,id)];}
+function mkKey(date,id,profile){return (profile||state.profile)+"::"+date+"::"+id;}
+function legacyMarkKey(date,id){return date+"::"+id;}
+function isMarked(date,id,profile){var m=getMarks();return !!(m[mkKey(date,id,profile)]||m[legacyMarkKey(date,id)]);}
 function heatCn(h){return h==="high"?T("high"):h==="rising"?T("rising"):T("medium");}
-function findItem(date,id){var d=daily(date);if(!d)return null;for(var i=0;i<d.items.length;i++)if(d.items[i].id===id)return d.items[i];return null;}
+function findItem(date,id,profile){var d=daily(date,profile);if(!d)return null;for(var i=0;i<d.items.length;i++)if(d.items[i].id===id)return d.items[i];return null;}
 
 function toggleMark(date,id,ev){
   if(ev)ev.stopPropagation();
-  var m=getMarks(),k=mkKey(date,id);
-  if(m[k])delete m[k];
-  else{var it=findItem(date,id);if(it)m[k]={date:date,id:id,title:it.title,summary:it.summary,dim:it.dim,url:it.url,heat:it.heat,tags:it.tags,content_type:it.content_type,relevance:it.relevance,date2:it.date,ts:Date.now()};}
+  var m=getMarks(),k=mkKey(date,id),old=legacyMarkKey(date,id);
+  if(m[k]||m[old]){delete m[k];delete m[old];}
+  else{var it=findItem(date,id,state.profile);if(it)m[k]={profile:state.profile,date:date,id:id,title:it.title,summary:it.summary,dim:it.dim,url:it.url,heat:it.heat,tags:it.tags,content_type:it.content_type,relevance:it.relevance,date2:it.date,ts:Date.now()};}
   setMarks(m);
   document.querySelectorAll('[data-star="'+k+'"]').forEach(function(el){el.classList.toggle('on');});
   renderNav();
@@ -488,7 +501,7 @@ function setProfile(profile){
     localStorage.setItem(PROFILE_KEY,profile);
     var q=document.getElementById("q");if(q)q.value="";
     window.scrollTo(0,0);render();
-  });
+  },profile);
 }
 
 /* ---------- 导航 ---------- */
@@ -537,9 +550,9 @@ function typeMatches(it){
   if(state.type==="all")return true;
   var ct=it.content_type||"";
   if(state.type==="papers")return ct==="paper"||(!ct&&it.dim==="paper");
-  if(state.type==="reports")return ["technical_report","official_research","model_card","long_blog"].indexOf(ct)>=0;
+  if(state.type==="reports")return ["technical_report","official_research","model_card","long_blog","filing","earnings"].indexOf(ct)>=0;
   if(state.type==="repos")return ["github_repo","model_card"].indexOf(ct)>=0||(!ct&&it.dim==="oss");
-  if(state.type==="news")return ["news","analysis"].indexOf(ct)>=0||(!ct&&["lab","fin"].indexOf(it.dim)>=0);
+  if(state.type==="news")return ["news","analysis","market_data","macro_release"].indexOf(ct)>=0||(!ct&&["lab","fin"].indexOf(it.dim)>=0);
   if(state.type==="kol")return ["x_status","x_article","long_blog"].indexOf(ct)>=0||(!ct&&it.dim==="kol");
   return true;
 }
@@ -581,6 +594,7 @@ function renderOverview(d){
   var h="";
   if(d.refresh_note)h+='<div class="hero-note">'+ico('refresh')+'<span>'+esc(d.refresh_note)+'</span></div>';
   if((d.profile||"general-ai")==="general-ai")h+='<div class="note tip">'+T("finance_explain")+'</div>';
+  if(d.profile==="investing-markets")h+='<div class="note tip">'+T("investing_explain")+'</div>';
   h+='<div class="stats">'+
     '<div class="stat hl"><div class="n">'+d.items.length+'</div><div class="l">'+T("items")+'</div></div>'+
     '<div class="stat"><div class="n">'+dimsFor(d).length+'</div><div class="l">'+T("dims")+'</div></div>'+
@@ -659,7 +673,7 @@ function todayTags(d){
 }
 function computeTrending(){
   var dates=profileDates(state.profile).slice(-7),seen={};
-  dates.forEach(function(dd){var dy=daily(dd.date);if(!dy)return;var loc={};
+  dates.forEach(function(dd){var dy=daily(dd.date,state.profile);if(!dy)return;var loc={};
     (dy.hot_topics_today||[]).forEach(function(ht){loc[ht.title]=true;});
     (dy.items||[]).forEach(function(it){(it.tags||[]).forEach(function(t){loc["#"+t]=true;});});
     Object.keys(loc).forEach(function(n){if(!seen[n])seen[n]={name:n,days:0,count:0};seen[n].days++;});});
@@ -668,10 +682,10 @@ function computeTrending(){
 
 function renderMarks(){
   var m=getMarks(),allKeys=Object.keys(m),keys=allKeys.sort(function(a,b){return m[b].ts-m[a].ts});
-  keys=keys.filter(function(k){return profileForDate(m[k].date)===state.profile&&applyFilter([m[k]]).length>0;});
+  keys=keys.filter(function(k){var mark=m[k];return (mark.profile===state.profile||(!mark.profile&&!!findItem(mark.date,mark.id,state.profile)))&&applyFilter([mark]).length>0;});
   if(!keys.length)return '<div class="empty">'+ico('star')+(allKeys.length?T("none"):T("mark_empty"))+'</div>';
   var h='<div class="note tip"><b>'+keys.length+'</b> '+T("mark_tip")+'</div><div class="grid">';
-  h+=keys.map(function(k){var it=m[k],di=dimMeta(daily(it.date),it.dim);
+  h+=keys.map(function(k){var it=m[k],di=dimMeta(daily(it.date,it.profile||state.profile),it.dim);
     var tags=(it.tags||[]).slice(0,3).map(function(t){return '<span class="tag">'+esc(t)+'</span>'}).join("");
     return '<div class="card has-star" onclick="openItemAt(\''+it.date+'\',\''+it.id+'\')">'+
       '<div class="star on" onclick="toggleMark(\''+it.date+'\',\''+it.id+'\',event)">'+ico('star')+'</div>'+
@@ -691,39 +705,43 @@ function renderHistory(){
   }).join("")+'</div>';
   return h;
 }
-function switchDate(date){loadDigest(date,function(){state.date=date;state.profile=profileForDate(date);state.view="overview";state.type="all";localStorage.setItem(PROFILE_KEY,state.profile);window.scrollTo(0,0);render();});}
-function langKey(date){return date+"#en";}
-function loadBaseDigest(date,cb){
-  var db=window.__DAILY__||{};
-  if(db[date]){cb&&cb();return;}
-  if(loadedLang[date]){cb&&cb();return;}
-  loadedLang[date]=true;
+function switchDate(date){loadDigest(date,function(){state.date=date;state.view="overview";state.type="all";localStorage.setItem(PROFILE_KEY,state.profile);window.scrollTo(0,0);render();},state.profile);}
+function langKey(date,profile){return date+"::"+profile+"#en";}
+function digestFile(date,profile){var entry=manifestEntry(date,profile);return entry?entry.file:"data/"+date+"/digest.js";}
+function loadBaseDigest(date,cb,profile){
+  profile=profile||state.profile;
+  if(daily(date,profile)){cb&&cb();return;}
+  var file=digestFile(date,profile);
+  if(loadedLang[file]){cb&&cb();return;}
+  loadedLang[file]=true;
   var s=document.createElement("script");
-  s.src="data/"+date+"/digest.js";
+  s.src=file;
   s.onload=function(){cb&&cb();};
   s.onerror=function(){alert(T("not_found")+" "+date+" data file");};
   document.head.appendChild(s);
 }
-function loadDigest(date,cb){
+function loadDigest(date,cb,profile){
   date=date||state.date;
+  profile=profile||state.profile;
   var db=window.__DAILY__||{};
-  if(UI_LANG==="en"&&!db[langKey(date)]&&!loadedLang[langKey(date)]){
-    loadedLang[langKey(date)]=true;
+  var baseFile=digestFile(date,profile),enFile=baseFile.replace(/digest\.js$/,"digest.en.js"),enKey=langKey(date,profile);
+  if(UI_LANG==="en"&&!db[enKey]&&!loadedLang[enFile]){
+    loadedLang[enFile]=true;
     var se=document.createElement("script");
-    se.src="data/"+date+"/digest.en.js";
+    se.src=enFile;
     se.onload=function(){cb&&cb();};
-    se.onerror=function(){loadBaseDigest(date,cb);};
+    se.onerror=function(){loadBaseDigest(date,cb,profile);};
     document.head.appendChild(se);
     return;
   }
-  loadBaseDigest(date,cb);
+  loadBaseDigest(date,cb,profile);
 }
 
 /* ---------- 弹窗（带返回栈） ---------- */
 function openItem(id){openItemAt(state.date,id);}
-function openItemAt(date,id){modalStack=[{type:"item",date:date,id:id}];loadDigest(date,renderModal);}
+function openItemAt(date,id){modalStack=[{type:"item",date:date,id:id,profile:state.profile}];loadDigest(date,renderModal,state.profile);}
 function openHot(i){modalStack=[{type:"hot",i:i}];renderModal();}
-function pushItem(date,id){modalStack.push({type:"item",date:date,id:id});renderModal();}
+function pushItem(date,id){modalStack.push({type:"item",date:date,id:id,profile:state.profile});renderModal();}
 function modalBack(){modalStack.pop();if(modalStack.length)renderModal();else closeModal();}
 function closeModal(){modalStack=[];document.getElementById("overlay").classList.remove("show");}
 document.addEventListener("keydown",function(e){if(e.key==="Escape"){if(modalStack.length>1)modalBack();else closeModal();}});
@@ -732,14 +750,15 @@ function renderModal(){
   var top=modalStack[modalStack.length-1];if(!top)return;
   var hasBack=modalStack.length>1;
   if(top.type==="hot")document.getElementById("modal").innerHTML=hotModalHTML(top.i,hasBack);
-  else loadDigest(top.date,function(){document.getElementById("modal").innerHTML=itemModalHTML(top.date,top.id,hasBack);});
+  else loadDigest(top.date,function(){document.getElementById("modal").innerHTML=itemModalHTML(top.date,top.id,hasBack,top.profile);},top.profile);
   document.getElementById("overlay").classList.add("show");
 }
 function backBtn(hasBack){return hasBack?'<span class="m-back" onclick="modalBack()">'+ico('back')+'返回</span>':'';}
 
-function itemModalHTML(date,id,hasBack){
-  var it=findItem(date,id);if(!it)return "";
-  var di=dimMeta(daily(date),it.dim),mt=it.meta||{},mk=isMarked(date,id);
+function itemModalHTML(date,id,hasBack,profile){
+  profile=profile||state.profile;
+  var it=findItem(date,id,profile);if(!it)return "";
+  var di=dimMeta(daily(date,profile),it.dim),mt=it.meta||{},mk=isMarked(date,id,profile);
   var kv="";
   if(mt.company)kv+='<span class="kv"><b>公司　</b>'+esc(mt.company)+'</span>';
   if(mt.subfield)kv+='<span class="kv"><b>子方向　</b>'+esc(mt.subfield)+'</span>';
@@ -749,6 +768,9 @@ function itemModalHTML(date,id,hasBack){
   if(mt.try)kv+='<span class="kv"><b>上手　</b>'+esc(mt.try)+'</span>';
   if(mt.venue)kv+='<span class="kv"><b>'+T("venue")+'　</b>'+esc(mt.venue)+'</span>';
   if(mt.arxiv_id||mt.arxiv)kv+='<span class="kv"><b>'+T("arxiv")+'　</b>'+esc(mt.arxiv_id||mt.arxiv)+'</span>';
+  if(mt.market)kv+='<span class="kv"><b>'+T("market")+'　</b>'+esc(mt.market)+'</span>';
+  if(mt.ticker)kv+='<span class="kv"><b>'+T("ticker")+'　</b>'+esc(mt.ticker)+'</span>';
+  if(mt.source_tier)kv+='<span class="kv"><b>'+T("source_tier")+'　</b>'+esc(mt.source_tier)+'</span>';
   if(it.relevance)kv+='<span class="kv"><b>'+T("relevance")+'　</b>'+esc(it.relevance)+'</span>';
   if(it.impact&&it.impact.length)kv+='<span class="kv"><b>'+T("impact")+'　</b>'+esc(it.impact.join(" · "))+'</span>';
   if(it.next_action)kv+='<span class="kv"><b>'+T("next_action")+'　</b>'+esc(it.next_action)+'</span>';
@@ -758,12 +780,16 @@ function itemModalHTML(date,id,hasBack){
   var b="";
   b+=blk("","grid","小白速览",it.summary);
   if(it.detail)b+=blk("detail","book","详细版",it.detail);
+  if(it.thesis)b+=blk("why","target",T("thesis"),it.thesis);
   if(it.method)b+=blk("detail","gear",T("method"),it.method);
   if(it.evidence)b+=blk("detail","shield",T("evidence"),it.evidence);
   if(it.key_points&&it.key_points.length)b+=listBlk("detail","list","关键要点",it.key_points);
   if(it.examples&&it.examples.length)b+=listBlk("ex","bulb","例子 / 场景",it.examples);
   if(it.product_implications&&it.product_implications.length)b+=listBlk("why","star","产品启发",it.product_implications);
   if(it.limitations&&it.limitations.length)b+=listBlk("","shield","边界 / 不要过度外推",it.limitations);
+  if(it.risks&&it.risks.length)b+=listBlk("","shield",T("risks"),it.risks);
+  if(it.invalidation)b+=blk("","x",T("invalidation"),it.invalidation);
+  if(it.watch_trigger)b+=blk("now","pulse",T("watch_trigger"),it.watch_trigger);
   if(it.why_now)b+=blk("now","refresh","为什么现在火",it.why_now);
   if(it.why)b+=blk("why","star","为什么值得关注",it.why);
   if(it.viggle_relation)b+=blk("why","target",T("viggle_relation"),it.viggle_relation);
@@ -831,6 +857,7 @@ function renderAbout(){
   '<h3>'+ico('target')+'这是什么</h3>'+
   '<p><b>'+T("profile")+'：</b>'+esc(profile)+'。当前主题为 '+esc(dimNames)+'。工作台按 profile 选择公开来源，保留原文、日期、判断依据和下一步实验，并支持标记、检索、历史回看与跨天热点追踪。</p>'+
   (profile==="general-ai"?'<div class="note tip">'+T("finance_explain")+'</div>':'')+
+  (profile==="investing-markets"?'<div class="note tip">'+T("investing_explain")+'</div>':'')+
   '<h3>'+ico('refresh')+'调研 Loop（Loop Engineering 设计）</h3>'+
   '<p>核心是一个<b>每天自动跑一圈、且能自我优化</b>的闭环。六个阶段：</p>'+
   '<div class="loop">'+
@@ -847,7 +874,7 @@ function renderAbout(){
     layer("clock","调度层 Scheduler","本地 cron / launchd；云端 GitHub Actions / 云函数定时器")+
     layer("pulse","采集层 Collectors","每个信源 = 一个可插拔采集器；配置全在 config/*.yaml")+
     layer("gear","处理层 Processor","LLM 翻译/总结/详细版/社区佐证；API Key 走环境变量")+
-    layer("doc","存储层 Storage","纯文件：data/年/月/日/digest.js（结构化、可清洗、可同步）")+
+    layer("doc","存储层 Storage","纯文件：data/年/月/日/&lt;profile&gt;/digest.js（同日多栏目、可同步）")+
     layer("grid","展现层 Workbench","零依赖单页 HTML，双击即用；云端直接当静态站托管")+
   '</div>'+
   '<p>关键设计：<b>配置与代码分离、数据用纯文件、展现零依赖</b>，让「本地能跑 = 云端能跑 = 别人一键部署」。</p>'+
@@ -855,7 +882,7 @@ function renderAbout(){
   '<div class="tbl"><table><tr><th>路径</th><th>作用</th></tr>'+
     row("index.html","工作台入口（本页）")+
     row("data/manifest.js","数据清单：有哪些日期、最新是哪天")+
-    row("data/2026/06/29/digest.js","当天 41 条情报（含详细版/为什么现在火/社区讨论）")+
+    row("data/年/月/日/&lt;profile&gt;/digest.js","同一天可保存多份 Profile 简报；旧 digest.js 继续兼容")+
     row("config/profiles/","可切换 profile；general-ai 保留原作者配置")+
     row("config/runtime.yaml","active_profile、语言与本地运行参数")+
     row("skills/daily-intelligence-workbench/","调研与数据契约")+
@@ -880,7 +907,7 @@ function layer(icn,t,d){return '<div class="layer"><div class="lic">'+ico(icn)+'
 function row(a,b){return '<tr><td><code>'+a+'</code></td><td>'+b+'</td></tr>';}
 
 /* ---------- 启动 ---------- */
-(function(){if(!state.date&&MANIFEST.dates&&MANIFEST.dates.length)state.date=MANIFEST.dates[MANIFEST.dates.length-1].date;loadDigest(state.date,function(){state.profile=(daily()&&daily().profile)||profileForDate(state.date);localStorage.setItem(PROFILE_KEY,state.profile);render();});})();
+(function(){if(!state.date&&MANIFEST.dates&&MANIFEST.dates.length)state.date=MANIFEST.dates[MANIFEST.dates.length-1].date;loadDigest(state.date,function(){state.profile=(daily(state.date,state.profile)&&daily(state.date,state.profile).profile)||profileForDate(state.date,state.profile);localStorage.setItem(PROFILE_KEY,state.profile);render();},state.profile);})();
 </script>
 </body>
 </html>

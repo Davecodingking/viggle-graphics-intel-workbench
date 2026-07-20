@@ -3,12 +3,13 @@
 """
 读当天 digest 的精华，推送到 config/push.yaml 或 config/secrets.env 配置的机器人 webhook。
 当前实现 lark / 飞书 自定义机器人(interactive 卡片)。开源后可在 build_card 旁加其它机器人 builder。
-用法：python3 scripts/push_lark.py [可选:webhook 覆盖] [可选:YYYY/MM/DD] [--dry-run]
+用法：python3 scripts/push_lark.py [可选:webhook 覆盖] [可选:YYYY/MM/DD] [--profile PROFILE] [--dry-run]
 依赖：仅标准库（不需要 PyYAML / requests）。
 """
 import re, json, sys, os, urllib.request
 import time, hmac, hashlib, base64
 
+from common import existing_digest_path, extract_latest_from_manifest
 from profiles import load_profile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -59,7 +60,13 @@ load_env_file(os.path.join(ROOT, "config", "local.env"))
 # 命令行覆盖
 args = sys.argv[1:]
 override_hook = next((a for a in args if a.startswith("http")), None)
-override_date = next((a for a in args if re.match(r"\d{4}/\d{2}/\d{2}", a)), None)
+override_date = next((a.replace("-", "/") for a in args if re.match(r"\d{4}[-/]\d{2}[-/]\d{2}$", a)), None)
+override_profile = None
+for index, arg in enumerate(args):
+    if arg.startswith("--profile="):
+        override_profile = arg.split("=", 1)[1]
+    elif arg == "--profile" and index + 1 < len(args):
+        override_profile = args[index + 1]
 env_hook = os.environ.get("DAILY_INTEL_LARK_WEBHOOK", "").strip()
 env_secret = os.environ.get("DAILY_INTEL_LARK_SECRET", "").strip()
 
@@ -100,12 +107,17 @@ if not webhooks:
 # ---------- 找当天 digest ----------
 date = override_date
 if not date:
-    mani = read(os.path.join(ROOT, "data", "manifest.js"))
-    m = re.search(r'latest:\s*"([^"]+)"', mani)
-    date = m.group(1) if m else "2026/06/29"
-digest_path = os.path.join(ROOT, "data", date, "digest.js")
-raw = read(digest_path)
+    date = extract_latest_from_manifest(override_profile)
+if not date:
+    print("[push] 未找到 profile=%s 的 digest" % (override_profile or "latest")); sys.exit(1)
+digest_path = existing_digest_path(date, override_profile)
+if not digest_path:
+    print("[push] 未找到 date=%s profile=%s 的 digest" % (date, override_profile or "latest")); sys.exit(1)
+raw = read(str(digest_path))
 payload_data = load_strict_payload(raw)
+digest_profile = (payload_data or {}).get("profile") or "general-ai"
+if override_profile and digest_profile != override_profile:
+    print("[push] digest profile=%s 与 --profile=%s 不一致" % (digest_profile, override_profile)); sys.exit(1)
 
 if payload_data:
     date_cn = payload_data.get("date_cn") or date
@@ -191,9 +203,15 @@ def build_lark_card():
             el.append({"tag": "div", "text": {"tag": "lark_md", "content": cn + "　" + safe(t) + link}})
     el.append({"tag": "hr"})
     el.append({"tag": "note", "elements": [{"tag": "lark_md", "content": "每日情报工作台 · 仅作辅助分析 · 以一手原文为准"}]})
+    profile_label = ""
+    if payload_data:
+        try:
+            profile_label = " · " + load_profile(digest_profile).get("label_zh", digest_profile)
+        except ValueError:
+            profile_label = " · " + digest_profile
     return {"msg_type": "interactive", "card": {
         "config": {"wide_screen_mode": True},
-        "header": {"title": {"tag": "plain_text", "content": "🛰️ " + cfg_get("title_prefix", "AI 每日情报") + " · " + date_cn + " 精华"}, "template": "blue"},
+        "header": {"title": {"tag": "plain_text", "content": "🛰️ " + cfg_get("title_prefix", "AI 每日情报") + profile_label + " · " + date_cn + " 精华"}, "template": "blue"},
         "elements": el}}
 
 builders = {"lark": build_lark_card, "feishu": build_lark_card}

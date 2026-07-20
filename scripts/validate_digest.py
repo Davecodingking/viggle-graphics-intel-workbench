@@ -7,19 +7,25 @@ import json
 import re
 import sys
 
-from common import ROOT, digest_path_for, extract_latest_from_manifest, read_text, slash_date
+from common import ROOT, existing_digest_path, extract_latest_from_manifest, manifest_entry, read_text, slash_date
 from profiles import load_profile
 
 
 CONTENT_TYPES = {
     "paper", "technical_report", "model_card", "github_repo", "news",
     "x_status", "x_article", "official_research", "analysis", "long_blog",
+    "filing", "earnings", "market_data", "macro_release",
 }
-RELEVANCE_VALUES = {"direct", "transferable", "systems", "watch"}
-NEXT_ACTION_VALUES = {"deep_read", "reproduce", "prototype", "watch"}
+RELEVANCE_VALUES = {"direct", "transferable", "systems", "watch", "portfolio", "watchlist", "market", "education"}
+NEXT_ACTION_VALUES = {
+    "deep_read", "reproduce", "prototype", "watch", "review_filing",
+    "update_thesis", "watch_catalyst", "portfolio_review",
+}
 IMPACT_VALUES = {
     "quality", "controllability", "latency", "throughput", "memory", "cost",
     "reliability", "developer_velocity", "safety", "data",
+    "growth", "margins", "cash_flow", "valuation", "catalyst", "macro",
+    "governance", "liquidity", "portfolio_risk",
 }
 
 
@@ -50,8 +56,9 @@ def _validate_strict_payload(payload, profile, errors, warnings):
     for field in ("date", "date_cn", "generated_at", "dimensions", "hot_topics_today", "items"):
         if field not in payload:
             errors.append("根字段缺失: %s" % field)
-    if profile["id"] == "viggle-graphics" and payload.get("profile") != profile["id"]:
-        errors.append("Viggle digest 根字段 profile 必须为 viggle-graphics")
+    strict_profile = bool(profile.get("strict_digest")) or profile["id"] == "viggle-graphics"
+    if strict_profile and payload.get("profile") != profile["id"]:
+        errors.append("严格 digest 根字段 profile 必须为 %s" % profile["id"])
     if payload.get("date") and not re.match(r"^\d{4}-\d{2}-\d{2}$", str(payload["date"])):
         errors.append("根字段 date 格式应为 YYYY-MM-DD")
 
@@ -63,15 +70,15 @@ def _validate_strict_payload(payload, profile, errors, warnings):
         for field in ("key", "cn", "overview"):
             if not dim.get(field):
                 errors.append("dimension %s 缺少 %s" % (dim.get("key", "(unknown)"), field))
-        if profile["id"] == "viggle-graphics":
+        if strict_profile:
             for field in ("en", "icon", "color", "notes"):
                 if not dim.get(field):
-                    errors.append("Viggle dimension %s 缺少 %s" % (dim.get("key", "(unknown)"), field))
+                    errors.append("严格 dimension %s 缺少 %s" % (dim.get("key", "(unknown)"), field))
 
     expected_dims = {dim["key"] for dim in profile["dimensions"]}
     actual_dims = set(filter(None, dim_keys))
-    if profile["id"] == "viggle-graphics" and actual_dims != expected_dims:
-        errors.append("Viggle dimensions 应为 %s，实际为 %s" % (sorted(expected_dims), sorted(actual_dims)))
+    if strict_profile and actual_dims != expected_dims:
+        errors.append("%s dimensions 应为 %s，实际为 %s" % (profile["id"], sorted(expected_dims), sorted(actual_dims)))
 
     items = payload.get("items") or []
     item_ids = [item.get("id") for item in items]
@@ -107,7 +114,7 @@ def _validate_strict_payload(payload, profile, errors, warnings):
             elif any(value not in IMPACT_VALUES for value in impacts):
                 errors.append("%s impact 含无效值: %s" % (label, impacts))
 
-        if profile["id"] == "viggle-graphics":
+        if strict_profile:
             if item.get("date") and not re.match(r"^\d{4}-\d{2}-\d{2}$", str(item["date"])):
                 errors.append("%s date 格式应为 YYYY-MM-DD" % label)
             if not content_type:
@@ -126,6 +133,20 @@ def _validate_strict_payload(payload, profile, errors, warnings):
         if item.get("depth") == "deep" and len(str(item.get("detail") or "")) < 500:
             warnings.append("深度条目 detail 偏短: %s" % label)
 
+        if profile["id"] == "investing-markets":
+            meta = item.get("meta") or {}
+            if meta.get("market") not in {"A股", "港股", "美股", "跨市场", "宏观"}:
+                errors.append("%s 缺少有效 meta.market" % label)
+            if meta.get("source_tier") not in {"primary", "verified_secondary", "discovery_only"}:
+                errors.append("%s 缺少有效 meta.source_tier" % label)
+            for field in ("thesis", "evidence", "invalidation", "watch_trigger"):
+                if not item.get(field):
+                    errors.append("%s 缺少 %s" % (label, field))
+            if not item.get("limitations") and not item.get("risks"):
+                errors.append("%s 缺少 limitations 或 risks" % label)
+            if item.get("dim") in {"companies", "valuation"} and not meta.get("ticker"):
+                errors.append("%s 公司/估值条目缺少 meta.ticker" % label)
+
     for topic in payload.get("hot_topics_today") or []:
         for field in ("title", "summary", "related"):
             if field not in topic or topic.get(field) in (None, ""):
@@ -137,11 +158,12 @@ def _validate_strict_payload(payload, profile, errors, warnings):
         if unknown_dims:
             errors.append("热点 %s 引用了不存在的 dimensions: %s" % (topic.get("title"), unknown_dims))
 
-    if profile["id"] == "viggle-graphics":
+    if strict_profile:
         covered = {item.get("dim") for item in items}
         missing_dims = expected_dims - covered
         if missing_dims:
-            errors.append("Viggle 样例/简报未覆盖维度: %s" % sorted(missing_dims))
+            errors.append("%s 样例/简报未覆盖维度: %s" % (profile["id"], sorted(missing_dims)))
+    if profile["id"] == "viggle-graphics":
         paper_dims = {
             item.get("dim") for item in items
             if item.get("content_type") in {"paper", "technical_report"}
@@ -149,6 +171,12 @@ def _validate_strict_payload(payload, profile, errors, warnings):
         for required in ("video", "graphics", "systems"):
             if required not in paper_dims:
                 warnings.append("Viggle 论文覆盖缺少 %s 维度" % required)
+
+    if profile["id"] == "investing-markets":
+        markets = {(item.get("meta") or {}).get("market") for item in items}
+        missing_markets = {"A股", "港股", "美股"} - markets
+        if missing_markets:
+            errors.append("投资简报未覆盖市场: %s" % sorted(missing_markets))
 
     if profile["id"] == "general-ai":
         kol_items = [item for item in items if item.get("dim") == "kol"]
@@ -168,12 +196,12 @@ def _validate_strict_payload(payload, profile, errors, warnings):
 
 def validate_digest(date_value, profile_override=None):
     if date_value == "latest":
-        date_value = extract_latest_from_manifest()
+        date_value = extract_latest_from_manifest(profile_override)
         if not date_value:
             raise SystemExit("[validate] manifest.js 未找到 latest")
     key = slash_date(date_value)
-    path = digest_path_for(key)
-    if not path.exists():
+    path = existing_digest_path(key, profile_override)
+    if not path:
         raise SystemExit("[validate] 未找到 digest: %s" % path)
 
     raw = read_text(path)
@@ -210,9 +238,8 @@ def validate_digest(date_value, profile_override=None):
     if len(urls) < max(1, len(item_ids) // 2):
         warnings.append("URL 数量偏少：%d urls / %d items" % (len(urls), len(item_ids)))
 
-    manifest = read_text(ROOT / "data" / "manifest.js")
-    if key not in manifest:
-        warnings.append("manifest.js 未包含 %s" % key)
+    if not manifest_entry(key, profile["id"]):
+        warnings.append("manifest.js 未包含 %s profile=%s" % (key, profile["id"]))
 
     print("[validate] profile=%s date=%s items=%d dimensions=%d hot_topics=%d urls=%d" % (
         profile["id"], key, len(item_ids), len(set(dims)), len(hot_topics), len(urls)

@@ -4,7 +4,7 @@
 
 AI Intel Workbench is a **local-first, open-source daily intelligence workflow for agents**. It helps Codex, Claude Code, or any skill-capable agent collect and structure daily AI + user-defined industry signals, then review them in a visual local dashboard.
 
-The default `viggle-graphics` profile targets video generation, human animation, graphics/3D/4D, inference systems and GPU pipelines, evaluation/safety, and the surrounding ecosystem. The author's original workflow and source files remain intact as the `general-ai` profile.
+The default `viggle-graphics` profile targets video generation, human animation, graphics/3D/4D, inference systems and GPU pipelines, evaluation/safety, and the surrounding ecosystem. The author's original workflow and source files remain intact as the `general-ai` profile. A third `investing-markets` profile provides filing-first A-share, Hong Kong and U.S. equity research without trade execution.
 
 Use it to track AI lab updates, X-first KOL opinions, frontier papers, open-source projects, and AI x finance / crypto / any configured industry. It includes configurable sources, a 59-person default KOL seed list, a research radar for researcher longform and lab papers, industry anchors, structured digests, output-language selection, a zero-dependency HTML workbench, optional Lark/Feishu bot pushes, and local scheduled runs.
 
@@ -58,7 +58,7 @@ Give that prompt to Codex, Claude Code, or another agent runtime. The agent shou
 
 Profile precedence is CLI `--profile`, then `config/runtime.yaml` `active_profile`, then the backward-compatible `general-ai` default. The Viggle profile uses five topical dimensions—video, graphics, systems, eval, and ecosystem—while papers remain a cross-topic `content_type` filter.
 
-Use the dashboard header to switch between Graphics and the original AI + Finance profile. The latter is not a stock-picking feed: it tracks AI in research, quant workflows, trading, payments, risk, and regulation, together with the market transmission of chips, compute, and AI products. Legacy manifest entries remain compatible and default to `general-ai`.
+Use the dashboard header to switch among Graphics, the original AI + Finance profile, and Investing & Stocks. The original finance column is not a stock-picking feed; the separate investing profile tracks markets, fundamentals, filings/catalysts, valuation scenarios, and portfolio risk across A shares, Hong Kong and U.S. equities. New data is stored at `data/YYYY/MM/DD/<profile>/digest.js`, allowing multiple profiles on one date. Legacy entries remain compatible and default to `general-ai`.
 
 Its radar checks arXiv `cs.CV/cs.GR/cs.LG`, official research/project pages, and Hugging Face daily; major graphics, vision, ML, multimedia, and systems venues weekly or around conference cycles; and TPAMI, IJCV, TVCG, TMM, and Computer Graphics Forum monthly or on keyword triggers. The source lists and problem × method × engineering-constraint query matrix live under `config/profiles/viggle-graphics/`.
 

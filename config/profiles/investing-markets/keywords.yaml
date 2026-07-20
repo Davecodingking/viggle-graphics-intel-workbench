@@ -1,0 +1,42 @@
+meta:
+  version: 1
+  profile: investing-markets
+
+markets: [A股, 港股, 美股]
+
+query_matrix:
+  events:
+    - earnings results revenue margin free cash flow guidance
+    - annual report quarterly report material event filing
+    - profit warning earnings preannouncement guidance revision
+    - share repurchase insider transaction secondary offering
+    - merger acquisition spin-off restructuring
+    - regulatory approval investigation antitrust
+    - product launch capacity expansion order backlog pricing
+  fundamentals:
+    - revenue growth gross margin operating margin
+    - free cash flow capital expenditure working capital
+    - net debt liquidity dilution stock based compensation
+    - segment revenue customer concentration competitive position
+  valuation:
+    - forward PE EV EBITDA price sales free cash flow yield
+    - sum of the parts normalized earnings scenario analysis
+    - expectations gap earnings revision valuation multiple
+  risk:
+    - thesis invalidation downside scenario governance audit
+    - concentration liquidity correlation drawdown position sizing
+    - accounting quality related party pledge margin leverage
+
+must_run_queries:
+  - 'site:cninfo.com.cn (年报 OR 季报 OR 业绩预告 OR 回购 OR 重大事项)'
+  - 'site:hkexnews.hk (annual results OR interim results OR profit warning OR inside information)'
+  - 'site:sec.gov/Archives/edgar/data (10-K OR 10-Q OR 8-K) (guidance OR revenue OR margin OR cash flow)'
+  - '(Federal Reserve OR 中国人民银行) (rates OR liquidity OR monetary policy)'
+
+filters:
+  lookback_days: 10
+  target_items: 12-18
+  minimum_per_dimension: 1
+  require_source_date: true
+  require_primary_evidence_for_company_claims: true
+  drop: [荐股群, 必涨, 翻倍, 内幕消息, 无风险, 保证收益, pump, rumor_only, sponsored]

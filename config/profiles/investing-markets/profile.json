@@ -1,0 +1,27 @@
+{
+  "id": "investing-markets",
+  "label_zh": "投资与股票",
+  "label_en": "Investing & Markets",
+  "description": "面向 A 股、港股和美股的公告优先型投资研究雷达；辅助形成和复核投资逻辑，不提供自动交易。",
+  "strict_digest": true,
+  "config": {
+    "sources": "config/profiles/investing-markets/sources.yaml",
+    "keywords": "config/profiles/investing-markets/keywords.yaml",
+    "radar": "config/profiles/investing-markets/research_radar.yaml"
+  },
+  "dimensions": [
+    {"key": "market", "cn": "市场与宏观", "en": "Markets & Macro", "icon": "pulse", "color": "#2563eb", "overview": "利率、通胀、汇率、流动性、指数风格与跨市场传导。", "notes": "优先央行、统计机构、交易所和官方经济数据；新闻只用于补充背景。"},
+    {"key": "companies", "cn": "公司与基本面", "en": "Companies & Fundamentals", "icon": "lab", "color": "#0d9488", "overview": "收入、利润率、现金流、资产负债表、竞争格局和管理层执行。", "notes": "A 股以交易所/巨潮公告为准，港股以 HKEXnews 为准，美股以 SEC EDGAR 与公司 IR 为准。"},
+    {"key": "catalysts", "cn": "财报、公告与催化剂", "en": "Earnings, Filings & Catalysts", "icon": "cal", "color": "#7c3aed", "overview": "财报、业绩指引、产品周期、资本动作、监管变化和关键事件。", "notes": "区分已发生事实、管理层指引、市场预期和未经证实传闻。"},
+    {"key": "valuation", "cn": "估值与情景", "en": "Valuation & Scenarios", "icon": "fin", "color": "#ea580c", "overview": "估值口径、关键假设、上行/基准/下行情景及预期差。", "notes": "所有估值结论必须标注数据日期、口径和关键敏感变量；不输出确定性目标价。"},
+    {"key": "risk", "cn": "风险与组合", "en": "Risk & Portfolio", "icon": "shield", "color": "#db2777", "overview": "证伪条件、仓位暴露、相关性、流动性、治理和行为偏差。", "notes": "只给复核和风险控制建议，不执行交易，不使用杠杆收益承诺。"}
+  ],
+  "research_instructions": [
+    "覆盖 A 股、港股和美股；先建立市场环境，再追踪公司公告、财报、催化剂、估值与组合风险。",
+    "证据层级为监管/交易所披露与公司 IR > 央行/统计机构 > 可信媒体 > 分析师或 KOL；社媒不得作为唯一投资依据。",
+    "每条区分事实、推断和待验证假设，并写明 thesis、evidence、limitations/risks、invalidation 与 watch_trigger。",
+    "不得生成无依据的买入/卖出指令、收益承诺或自动下单；next_action 仅用于复核公告、更新逻辑、观察催化剂或组合风险检查。",
+    "默认从跨市场高信号主题和用户未来配置的 watchlist 选股，不为了凑数罗列行情。"
+  ],
+  "push_priority": ["catalysts", "companies", "risk"]
+}

@@ -1,0 +1,55 @@
+# 投资与股票 profile：A 股、港股、美股；一手披露优先。
+meta:
+  version: 1
+  updated: 2026-07-20
+  profile: investing-markets
+  disclaimer: 仅作信息聚合与研究辅助，不构成投资建议或交易指令。
+
+source_hierarchy:
+  tier_1_primary:
+    - 监管机构、交易所公告、上市公司法定披露与 Investor Relations
+    - 央行、统计机构、财政部门和其他官方经济数据
+  tier_2_verified:
+    - Reuters、Bloomberg、财联社等具备采编与更正机制的媒体
+  tier_3_discovery_only:
+    - 分析师观点、Newsletter、X/社交媒体和社区讨论
+
+markets:
+  a_share:
+    filings:
+      - { name: 巨潮资讯 CNINFO, url: https://www.cninfo.com.cn, official: true }
+      - { name: 上海证券交易所, url: https://www.sse.com.cn, official: true }
+      - { name: 深圳证券交易所, url: https://www.szse.cn, official: true }
+      - { name: 北京证券交易所, url: https://www.bse.cn, official: true }
+    macro:
+      - { name: 中国人民银行, url: https://www.pbc.gov.cn, official: true }
+      - { name: 国家统计局, url: https://www.stats.gov.cn, official: true }
+      - { name: 中国证监会, url: https://www.csrc.gov.cn, official: true }
+  hong_kong:
+    filings:
+      - { name: HKEXnews, url: https://www.hkexnews.hk, official: true }
+      - { name: Hong Kong Exchanges and Clearing, url: https://www.hkex.com.hk, official: true }
+    macro:
+      - { name: Hong Kong Monetary Authority, url: https://www.hkma.gov.hk, official: true }
+      - { name: Census and Statistics Department, url: https://www.censtatd.gov.hk, official: true }
+      - { name: Securities and Futures Commission, url: https://www.sfc.hk, official: true }
+  us:
+    filings:
+      - { name: SEC EDGAR Search, url: https://www.sec.gov/search-filings, official: true }
+      - { name: SEC EDGAR APIs, url: https://www.sec.gov/search-filings/edgar-application-programming-interfaces, official: true }
+      - { name: Company Investor Relations, url: https://www.sec.gov/edgar/browse, official: true, note: 从 SEC 公司页跳转并与公司 IR 交叉验证 }
+    macro:
+      - { name: Federal Reserve, url: https://www.federalreserve.gov, official: true }
+      - { name: FRED, url: https://fred.stlouisfed.org, official: true }
+      - { name: Bureau of Labor Statistics, url: https://www.bls.gov, official: true }
+      - { name: Bureau of Economic Analysis, url: https://www.bea.gov, official: true }
+
+secondary_context:
+  - { name: Reuters Markets, url: https://www.reuters.com/markets }
+  - { name: Bloomberg Markets, url: https://www.bloomberg.com/markets }
+  - { name: 财联社, url: https://www.cls.cn }
+  - { name: 上海证券报, url: https://www.cnstock.com }
+
+market_data_note: >
+  价格、估值和一致预期数据必须写明截点与来源。免费网页数据若无法确认复权、币种、时区或延迟，
+  只作观察信号，不作为精确交易依据。

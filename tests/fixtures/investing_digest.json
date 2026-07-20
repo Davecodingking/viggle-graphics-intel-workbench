@@ -1,0 +1,64 @@
+{
+  "date": "2026-07-20",
+  "date_cn": "2026年7月20日 · 周一",
+  "generated_at": "2026-07-20",
+  "profile": "investing-markets",
+  "language": "zh",
+  "refresh_note": "结构验证样例，不代表真实投资观点或实时行情。",
+  "market_mood": "样例仅验证跨市场结构、证据层级与风险字段。",
+  "dimensions": [
+    {"key": "market", "overview": "验证市场环境维度。"},
+    {"key": "companies", "overview": "验证公司基本面维度。"},
+    {"key": "catalysts", "overview": "验证公告催化剂维度。"},
+    {"key": "valuation", "overview": "验证估值情景维度。"},
+    {"key": "risk", "overview": "验证组合风险维度。"}
+  ],
+  "hot_topics_today": [
+    {
+      "title": "跨市场证据链验证",
+      "heat": "high",
+      "dims": ["market", "companies", "catalysts"],
+      "summary": "同一结论需要宏观、公告与公司基本面相互印证。",
+      "related": ["market-1", "companies-1", "catalysts-1"]
+    }
+  ],
+  "items": [
+    {
+      "id": "market-1", "dim": "market", "title": "美股宏观环境结构样例", "source": "Federal Reserve", "url": "https://www.federalreserve.gov/monetarypolicy.htm", "date": "2026-07-20", "heat": "medium", "tags": ["美股", "利率"],
+      "summary": "用官方货币政策信息验证市场环境字段。", "detail": "这是测试 fixture，用于确认市场维度可以记录事实、推断、证伪条件与下一观察点，不代表对利率方向的实时判断。",
+      "content_type": "macro_release", "relevance": "market", "impact": ["macro", "valuation", "liquidity"], "next_action": "watch",
+      "thesis": "利率与流动性变化会影响权益估值，但方向和幅度需要数据确认。", "evidence": "示例证据来自 Federal Reserve 官方页面。", "limitations": ["fixture 不含实时数据"], "invalidation": "后续官方数据与假设方向相反。", "watch_trigger": "下一次官方政策声明或经济数据发布。",
+      "meta": {"market": "美股", "source_tier": "primary"}
+    },
+    {
+      "id": "companies-1", "dim": "companies", "title": "A 股公司基本面结构样例", "source": "巨潮资讯", "url": "https://www.cninfo.com.cn", "date": "2026-07-20", "heat": "medium", "tags": ["A股", "财报"],
+      "summary": "用法定披露验证公司研究字段。", "detail": "这是结构测试，不对应特定公司的实时财务结论。正式简报必须从公告提取收入、利润率、现金流和资产负债表变化。",
+      "content_type": "filing", "relevance": "watchlist", "impact": ["growth", "margins", "cash_flow"], "next_action": "review_filing",
+      "thesis": "公司逻辑应由持续经营数据而不是单条新闻驱动。", "evidence": "示例证据入口为巨潮资讯法定披露平台。", "risks": ["样例没有真实财务数字"], "invalidation": "正式公告不支持原有增长或现金流假设。", "watch_trigger": "下一份定期报告或业绩预告。",
+      "meta": {"market": "A股", "ticker": "SAMPLE-A", "source_tier": "primary"}
+    },
+    {
+      "id": "catalysts-1", "dim": "catalysts", "title": "港股公告催化剂结构样例", "source": "HKEXnews", "url": "https://www.hkexnews.hk", "date": "2026-07-20", "heat": "rising", "tags": ["港股", "公告"],
+      "summary": "验证港股催化剂以 HKEXnews 公告为主证据。", "detail": "这是测试 fixture。正式简报会区分已经公告的事实、管理层指引、媒体信息与市场推断，并记录催化剂是否已被价格反映。",
+      "content_type": "filing", "relevance": "watchlist", "impact": ["catalyst", "governance"], "next_action": "watch_catalyst",
+      "thesis": "重大公告可能改变盈利或风险假设，但必须阅读全文。", "evidence": "示例证据入口为 HKEXnews。", "limitations": ["未绑定真实发行人"], "invalidation": "公告细节不改变现金流或治理假设。", "watch_trigger": "正式结果公告或后续通函。",
+      "meta": {"market": "港股", "ticker": "SAMPLE-HK", "source_tier": "primary"}
+    },
+    {
+      "id": "valuation-1", "dim": "valuation", "title": "美股估值情景结构样例", "source": "SEC EDGAR", "url": "https://www.sec.gov/search-filings", "date": "2026-07-20", "heat": "medium", "tags": ["美股", "估值"],
+      "summary": "验证估值结论保留数据日期、口径和情景假设。", "detail": "这是测试 fixture。正式条目需从 10-K、10-Q 或 8-K 提取可核对数据，并给出上行、基准和下行情景，而不是确定性目标价。",
+      "content_type": "analysis", "relevance": "portfolio", "impact": ["valuation", "cash_flow"], "next_action": "update_thesis",
+      "thesis": "估值应随现金流、增长和风险假设变化。", "evidence": "示例证据入口为 SEC EDGAR。", "limitations": ["无实时价格与一致预期"], "invalidation": "关键现金流或增长假设失效。", "watch_trigger": "新财报、指引或价格显著偏离情景区间。",
+      "meta": {"market": "美股", "ticker": "SAMPLE-US", "source_tier": "primary", "currency": "USD", "as_of": "2026-07-20"}
+    },
+    {
+      "id": "risk-1", "dim": "risk", "title": "跨市场组合风险结构样例", "source": "FINRA", "url": "https://www.finra.org/investors/insights/following-crowd-investing-and-social-media", "date": "2026-07-20", "heat": "high", "tags": ["跨市场", "风险"],
+      "summary": "验证组合风险和社媒信息边界。", "detail": "这是测试 fixture，用于确保简报不会把社媒热度当成唯一投资依据，也不会输出自动下单或保证收益指令。",
+      "content_type": "analysis", "relevance": "education", "impact": ["portfolio_risk", "liquidity"], "next_action": "portfolio_review",
+      "thesis": "投资观点必须落到来源质量、仓位承受能力和证伪条件。", "evidence": "FINRA 投资者教育材料用于验证风险边界。", "risks": ["社媒误导", "集中度", "流动性"], "invalidation": "组合风险暴露已被独立数据证明处于可接受范围。", "watch_trigger": "集中度、相关性或波动率越过用户设定阈值。",
+      "meta": {"market": "跨市场", "source_tier": "primary"}
+    }
+  ],
+  "kol_list": [],
+  "practice_list": ["先读公告，再读观点；记录证伪条件；不因单条消息执行交易。"]
+}

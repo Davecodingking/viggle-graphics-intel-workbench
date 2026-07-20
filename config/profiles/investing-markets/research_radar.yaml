@@ -1,0 +1,38 @@
+meta:
+  version: 1
+  profile: investing-markets
+
+cadence:
+  daily_check:
+    - 本周是否已有合格 investing-markets digest；若有则不重复生成
+    - 交易所与监管披露中的重大事项、业绩预告、财报、回购、融资和治理变化
+    - 主要央行、统计机构与市场风险事件
+  weekly_monday_or_catch_up:
+    - 汇总 A 股、港股、美股过去一周的市场环境与高信号变化
+    - 选择能形成或改变投资逻辑的公司事件，不做全市场新闻搬运
+    - 更新估值假设、催化剂日历、证伪条件和组合风险观察
+  event_triggered:
+    - 财报季、央行会议、重大监管政策、并购重组、利润预警和异常波动
+
+selection_policy:
+  target_items: 12-18
+  minimum_per_dimension: 1
+  market_coverage: [A股, 港股, 美股]
+  evidence_order: [official_filing, exchange_or_regulator, company_ir, official_macro, reputable_media, analyst_or_social]
+  fact_inference_separation: required
+  no_trade_execution: true
+  no_guaranteed_returns: true
+
+item_requirements:
+  - meta.market；公司条目同时给出 meta.ticker
+  - meta.source_tier 为 primary、verified_secondary 或 discovery_only
+  - thesis 与 evidence
+  - limitations 或 risks
+  - invalidation 与 watch_trigger
+  - 数据日期、币种和估值口径（涉及价格或估值时）
+  - 明确区分事实、推断与待验证假设
+
+decision_policy:
+  next_action: [review_filing, update_thesis, watch_catalyst, portfolio_review, watch]
+  relevance: [portfolio, watchlist, market, education, watch]
+  impact: [growth, margins, cash_flow, valuation, catalyst, macro, governance, liquidity, portfolio_risk]

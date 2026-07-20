@@ -1,10 +1,12 @@
 # Digest Data Schema
 
-The workbench stores one daily digest at:
+The workbench stores new profile-aware digests at:
 
 ```text
-data/YYYY/MM/DD/digest.js
+data/YYYY/MM/DD/<profile-id>/digest.js
 ```
+
+Legacy `data/YYYY/MM/DD/digest.js` files remain supported. Profile-aware files use the JavaScript key `YYYY/MM/DD::<profile-id>`, allowing several profiles on the same date.
 
 The frontend loads it through:
 
@@ -64,7 +66,7 @@ The deterministic writer also accepts canonical JSON:
       "why_now": "Why now",
       "buzz": "Community discussion",
       "x_src": ["https://x.com/.../status/..."],
-      "content_type": "news | x_status | x_article | official_research | paper | technical_report | model_card | github_repo | analysis",
+      "content_type": "news | x_status | x_article | official_research | paper | technical_report | model_card | github_repo | analysis | filing | earnings | market_data | macro_release",
       "depth": "normal | deep",
       "key_points": ["Point 1", "Point 2"],
       "examples": ["Concrete example"],
@@ -90,6 +92,8 @@ The deterministic writer also accepts canonical JSON:
 - Item: `id`, `dim`, `title`, `source`, `url`, `date`, `summary`, `detail`
 
 For `viggle-graphics`, each item also requires `content_type`, `relevance`, `impact`, and `next_action`. Paper and technical-report entries require an original URL, publication date, and `meta.venue` or `meta.arxiv`.
+
+For `investing-markets`, each item requires `content_type`, `relevance`, `impact`, `next_action`, `meta.market`, `meta.source_tier`, `thesis`, `evidence`, `invalidation`, `watch_trigger`, and either `limitations` or `risks`. Company and valuation entries also require `meta.ticker`; every digest covers A shares, Hong Kong and U.S. equities. Allowed investing actions are `review_filing`, `update_thesis`, `watch_catalyst`, `portfolio_review`, and `watch`. The profile never executes trades or promises returns.
 
 Legacy digests without `profile` or the newer decision fields remain readable and are interpreted with `general-ai` compatibility defaults; they do not need to be migrated.
 
