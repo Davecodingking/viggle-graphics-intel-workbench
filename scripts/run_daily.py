@@ -29,15 +29,9 @@ from common import (
     slash_date,
     write_text,
 )
+from profiles import load_profile, profile_config_lines, public_dimensions
 
 
-DEFAULT_DIMENSIONS = [
-    {"key": "lab", "cn": "AI 大厂动态"},
-    {"key": "kol", "cn": "KOL 观点"},
-    {"key": "paper", "cn": "前沿论文"},
-    {"key": "oss", "cn": "开源项目"},
-    {"key": "fin", "cn": "AI × 金融"},
-]
 LANGUAGE_INSTRUCTIONS = {
     "zh": "最终 digest 的标题、摘要、详细解释、热点、维度概览与 practice_list 使用简体中文；技术术语、公司名、项目名、URL 保留原文。",
     "en": "Write the final digest titles, summaries, details, hot topics, dimension overviews, and practice_list in English. Keep source names, project names, tickers, and URLs unchanged.",
@@ -49,8 +43,10 @@ def js_value(obj, indent=2):
     return json.dumps(obj, ensure_ascii=False, indent=indent)
 
 
-def load_config_kol_list():
-    path = ROOT / "config" / "kol.yaml"
+def load_config_kol_list(profile):
+    path = (profile.get("_config_paths") or {}).get("kol")
+    if not path:
+        return []
     if not path.exists():
         return []
     items = []
@@ -72,32 +68,51 @@ def load_config_kol_list():
     return items
 
 
-def apply_persistent_config(payload):
-    config_kol = load_config_kol_list()
+def apply_persistent_config(payload, profile):
+    config_kol = load_config_kol_list(profile)
     if config_kol and len(payload.get("kol_list") or []) < len(config_kol):
         payload["kol_list"] = config_kol
     return payload
 
 
-def write_digest_from_json(date_value, json_path, language_override=None):
+def merge_dimensions(payload_dimensions, profile):
+    configured = {dim["key"]: dim for dim in public_dimensions(profile)}
+    if not payload_dimensions:
+        return list(configured.values())
+    merged = []
+    for raw in payload_dimensions:
+        dim = dict(configured.get(raw.get("key"), {}))
+        dim.update(raw)
+        merged.append(dim)
+    return merged
+
+
+def write_digest_from_json(date_value, json_path, language_override=None, profile_override=None):
     date_iso = normalize_date(date_value)
     key = slash_date(date_iso)
     cfg = runtime_config()
     language = (language_override or cfg.get("output_language") or "zh").strip()
     if language not in LANGUAGE_INSTRUCTIONS:
         language = "zh"
+    try:
+        profile = load_profile(profile_override)
+    except ValueError as exc:
+        raise SystemExit(str(exc))
     payload = load_json(json_path)
-    payload.setdefault("date", date_iso)
-    payload.setdefault("language", language)
-    payload.setdefault("date_cn", date_label(date_iso))
-    payload.setdefault("generated_at", date_iso)
+    source_date = payload.get("date")
+    payload["date"] = date_iso
+    payload["language"] = language
+    if source_date != date_iso or not payload.get("date_cn"):
+        payload["date_cn"] = date_label(date_iso)
+    payload["generated_at"] = date_iso
     payload.setdefault("refresh_note", "由 Daily Intelligence Workbench 生成。")
-    payload.setdefault("dimensions", DEFAULT_DIMENSIONS)
+    payload["profile"] = profile["id"]
+    payload["dimensions"] = merge_dimensions(payload.get("dimensions"), profile)
     payload.setdefault("hot_topics_today", [])
     payload.setdefault("items", [])
     payload.setdefault("kol_list", [])
     payload.setdefault("practice_list", [])
-    payload = apply_persistent_config(payload)
+    payload = apply_persistent_config(payload, profile)
 
     out = digest_path_for(date_iso)
     text = [
@@ -179,45 +194,61 @@ def copy_sample(date_value, sample_date):
     print("[run] 已复制样例 %s -> %s" % (old_key, new_key))
 
 
-def create_research_prompt(date_value, language_override=None):
+def create_research_prompt(date_value, language_override=None, profile_override=None):
     date_iso = normalize_date(date_value)
     cfg = runtime_config()
     language = (language_override or cfg.get("output_language") or "zh").strip()
     if language not in LANGUAGE_INSTRUCTIONS:
         language = "zh"
+    try:
+        profile = load_profile(profile_override)
+    except ValueError as exc:
+        raise SystemExit(str(exc))
     language_instruction = LANGUAGE_INSTRUCTIONS[language]
     run_dir = ROOT / ".daily-intel" / "runs" / date_iso
     prompt_path = run_dir / "research_prompt.md"
+    dimensions = "\n".join(
+        "- `{key}`: {cn} / {en}".format(**dim)
+        for dim in profile["dimensions"]
+    )
+    instructions = "\n".join(
+        "%d. %s" % (index, instruction)
+        for index, instruction in enumerate(profile.get("research_instructions") or [], 1)
+    )
     prompt = """# Daily Intelligence Research Task
 
 日期：{date_iso}
 工作区：{root}
 产出语言：{language} — {language_instruction}
+Profile：`{profile_id}` — {profile_label}
 
-请基于本仓库的 `skills/daily-intelligence-workbench/SKILL.md` 和 `docs/调研方法论与Loop设计.md` 生成当日 AI 情报。
+请基于本仓库的 `skills/daily-intelligence-workbench/SKILL.md`、当前 profile 和调研方法论生成当日情报。
 
-执行要求：
+## 当前配置
 
-1. 读取 `config/industry.yaml`、`config/sources.yaml`、`config/keywords.yaml`、`config/kol.yaml`、`config/research_radar.yaml`。
-2. 先执行 `config/research_radar.yaml` 的高优先级雷达，再做普通五维度搜索。雷达必须覆盖：
-   - 研究员长文 / X Articles：尤其 Anthropic Claude Code、OpenAI/alignment 研究员；
-   - 官方研究页：Anthropic Research、OpenAI Research、OpenAI Alignment、Google DeepMind Research；
-   - 国产前沿实验室：DeepSeek、Kimi/Moonshot、Z.ai/GLM、Qwen；检查 official page、Hugging Face model card、GitHub technical report；
-   - 开源金融/量化 Agent：从 X 讨论 + GitHub topics 双入口发现，不只看 stars。
-3. 按五维度调研：AI 大厂动态、KOL 观点、前沿论文、开源项目、AI × 金融。研究雷达发现可进入任一维度。
-4. KOL 观点维度必须执行 X-first 流程：先从 `config/kol.yaml` 取重点 handle，用 `site:x.com/<handle>/status`、`site:x.com/<handle>/article`、公开 X status/profile/article、已配置的 Gate-News `news_feed_search_x` / X API / 本机 provider 发现近 7 天帖子；目标是 KOL 维度至少 60% 条目来自 X status/profile/article 或带 `x_src` 的 X 证据。若达不到，必须在 `dimensions[].notes` 写明 provider 限制和 fallback 来源。
-5. 优先英文关键词与一手来源；X/Twitter 只用可访问的公开 status/profile/article 或用户本地显式配置的 provider，不读取 cookie/token。
-6. 对 DeepSeek、Kimi/Moonshot、智谱/Z.ai、Qwen 的文章、论文、模型卡、GitHub release 提升优先级；即使它们不是当天最大舆论，也要纳入候选池并给出是否入选的判断。
-7. 开源项目额外关注金融 Agent、量化 Agent、AI 投研、回测/券商/交易所接口、自动推送、风控闭环；星少但机制新、X 讨论早期升温的项目可标 `potential=潜力新星`。
-8. 过滤营销、招聘、重复与不可验证信息；保留来源 URL、日期和可信度说明。不要因为高价值研究员长文暂时不够病毒传播就直接丢弃。
-9. 长文/研究项写作规则：若 `content_type` 是 `x_article`、`official_research`、`paper`、`technical_report`、`model_card`，通常设置 `depth=deep`，`detail` 至少约 650 个中文字符，并补充 `key_points`、`examples`、`product_implications`、`limitations`。目标是用户不跳原文也能了解七七八八。
-10. 按“产出语言”要求组织 `title`、`summary`、`detail`、`why`、`buzz`、`dimensions.overview`、`hot_topics_today.summary`、`practice_list` 等面向用户字段。
-11. 产出 canonical JSON，字段参考 `skills/daily-intelligence-workbench/references/data-schema.md`。
-12. 写入后运行：
+{config_lines}
+
+维度：
+{dimensions}
+
+Profile 规则：
+{instructions}
+
+## 执行要求
+
+1. 先读 profile.json 与上述配置文件，先跑 radar，再按 sources 与 keywords 搜索。
+2. 英文关键词优先；主 URL 优先使用顶会、期刊、arXiv、官方研究页、项目页、GitHub 或 Hugging Face。社媒主要用于发现和讨论证据。
+3. 过滤营销、招聘、重复、不可验证与超时间窗口内容；每条保留 URL、日期和可信度备注。
+4. 每个 item 的 `dim` 必须来自当前维度；`content_type` 使用 `paper/technical_report/model_card/github_repo/news/x_status/x_article/official_research/analysis`。
+5. 每个 item 填写 `relevance`（direct/transferable/systems/watch）、`impact` 数组、`next_action`（deep_read/reproduce/prototype/watch）；可验证时填写 `experiment`。
+6. 论文或技术报告在 `meta.venue` 或 `meta.arxiv_id` 中保留身份信息，并填写 `method/evidence/viggle_relation/limitations/experiment`，写清方法、证据、局限、与 Viggle 的关系和最小实验。
+7. 重要研究项通常设置 `depth=deep`，中文 detail 目标 650-1400 字，并补 `key_points/examples/product_implications/limitations`。
+8. 产出 canonical JSON，字段参考 `skills/daily-intelligence-workbench/references/data-schema.md`，根字段写 `profile: {profile_id}`。
+9. 写入后运行：
 
 ```bash
-python3 scripts/run_daily.py --date {date_iso} --from-json <canonical-json-path>
-python3 scripts/validate_digest.py --date {date_iso}
+python3 scripts/run_daily.py --date {date_iso} --profile {profile_id} --from-json <canonical-json-path>
+python3 scripts/validate_digest.py --date {date_iso} --profile {profile_id}
 ```
 
 可选：
@@ -230,6 +261,11 @@ python3 scripts/push_lark.py
         root=ROOT,
         language=language,
         language_instruction=language_instruction,
+        profile_id=profile["id"],
+        profile_label=profile.get("label_zh", profile["id"]),
+        config_lines=profile_config_lines(profile),
+        dimensions=dimensions,
+        instructions=instructions,
     )
     write_text(prompt_path, prompt)
     print("[run] 已生成 agent 调研提示:", prompt_path)
@@ -262,18 +298,25 @@ def main():
     parser.add_argument("--push", action="store_true", help="Push after successful validation")
     parser.add_argument("--strict", action="store_true", help="Exit non-zero when no digest is generated")
     parser.add_argument("--language", choices=sorted(LANGUAGE_INSTRUCTIONS), help="Override runtime.yaml output_language for this run")
+    parser.add_argument("--profile", help="Profile id; overrides config/runtime.yaml active_profile")
     args = parser.parse_args()
 
     date_iso = normalize_date(args.date)
+    try:
+        profile = load_profile(args.profile)
+    except ValueError as exc:
+        raise SystemExit(str(exc))
 
     if args.from_json:
-        write_digest_from_json(date_iso, args.from_json, args.language)
+        write_digest_from_json(date_iso, args.from_json, args.language, profile["id"])
     elif args.sample:
+        if profile["id"] != "general-ai":
+            raise SystemExit("[run] 内置 --sample 属于 general-ai；Viggle 样例请使用 tests/fixtures/viggle_digest.json")
         copy_sample(date_iso, args.sample_date)
     elif digest_path_for(date_iso).exists():
         print("[run] 当日 digest 已存在:", digest_path_for(date_iso))
     else:
-        prompt_path = create_research_prompt(date_iso, args.language)
+        prompt_path = create_research_prompt(date_iso, args.language, profile["id"])
         rc = maybe_run_agent(date_iso, prompt_path)
         if rc != 0:
             sys.exit(rc)
@@ -281,7 +324,10 @@ def main():
             raise SystemExit("[run] 未生成 digest: %s" % digest_path_for(date_iso))
 
     if digest_path_for(date_iso).exists():
-        rc = subprocess.call([sys.executable, "scripts/validate_digest.py", "--date", date_iso], cwd=str(ROOT))
+        rc = subprocess.call([
+            sys.executable, "scripts/validate_digest.py", "--date", date_iso,
+            "--profile", profile["id"],
+        ], cwd=str(ROOT))
         if rc != 0:
             sys.exit(rc)
         if args.push:

@@ -6,7 +6,7 @@
 
 ## 一、设计目标与三原则
 
-**目标**：让一个 AI 从业者每天花 10 分钟，就能保持对行业的敏感视野——知道头部公司在做什么、圈内在讨论什么、有什么新论文/新项目值得深挖、AI×金融在发生什么。
+**目标**：让从业者每天花 10 分钟，就能保持对目标领域的敏感视野——知道研究、工程系统、开源生态和产业正在发生什么，以及下一步应该读、复现、评测还是观察。
 
 **三原则**：
 1. **一手优先**：官方 newsroom / arXiv / GitHub 仓库页 > 媒体二手报道 > 社媒转述。每条必须有可访问 URL。
@@ -15,7 +15,15 @@
 
 ---
 
-## 二、五维度调研范式
+## 二、Profile 与主题维度
+
+工作台用 profile 隔离不同研究目标。解析顺序是 CLI `--profile` → `config/runtime.yaml` 的 `active_profile` → `general-ai` 兼容默认；v1 一次只生成一个 profile 的 digest。
+
+默认 `viggle-graphics` 采用五个主题：视频生成与人物动画、图形学与 3D/4D、推理系统/GPU/Pipeline、评测/数据/安全、开源/产品/产业生态。论文是跨主题 `content_type`：视频论文进入 `video`，渲染或 Gaussian Splatting 论文进入 `graphics`，推理与调度论文进入 `systems`，再由 Papers 筛选聚合查看。
+
+检索使用“问题 × 方法 × 工程约束”的组合矩阵，例如 human animation / identity / temporal consistency × diffusion / neural rendering / Gaussian Splatting × latency / memory / throughput / stability。论文雷达分为每日 arXiv 与官方项目页、每周/会期顶会与系统会议、每月/关键词触发期刊。TVCG 不是低优先级刊物，但在本 profile 中重点追踪 VR/AR、交互式 3D、Scientific Visualization 与可视化系统，而非无差别全量扫描。
+
+`general-ai` 完整保留原作者配置与以下五维调研范式：
 
 每个维度都遵循统一管线：**定信源 → 英文关键词搜 → 过滤排序 → 结构化 + 小白化**。
 
@@ -55,7 +63,7 @@
 | 阶段 | 做什么 | 输入 | 输出 |
 |---|---|---|---|
 | ① 触发 Trigger | 每天定时启动（cron/launchd/云定时器），可手动补跑 | 日期 | 一次调研任务 |
-| ② 采集 Collect | 按 `sources.yaml` 分 5 维度并行 fan-out，抓最近 7–14 天 | config | 各维度原始候选 |
+| ② 采集 Collect | 按 profile 的 `sources.yaml` 分主题 fan-out，并按各来源节奏抓取 | config | 各主题原始候选 |
 | ③ 清洗 Clean | 去重 + 噪音过滤 + 打标签 + 翻译 + 小白化 + 配案例 | 原始候选 | `raw/*.json` + `digest.js` |
 | ④ 呈现 Present | 写入日期文件夹，更新 `manifest.js`，刷新工作台 | digest | 工作台当日视图 |
 | ⑤ 反馈 Feedback | 你在工作台 ⭐ 标记感兴趣的条目 | 你的点击 | 偏好信号（哪些源/主题真有用） |
@@ -77,9 +85,9 @@
 ## 四、每日执行 SOP
 
 1. **触发**：发起当日调研（或定时自动）。
-2. **采集 + 清洗**：5 个子 Agent 并行联网，各自返回结构化 + 小白化结果（含来源、日期、可信度备注）。
+2. **采集 + 清洗**：按 profile 主题联网调研，返回结构化结果（含来源、日期、可信度、相关性、影响和下一步动作）。
 3. **落盘**：写 `data/年/月/日/raw/*.json`（原始）+ `digest.js`（清洗后）+ `manifest.js` 追加一条。
-4. **查看**：打开 `index.html` → 今日速览（五维度 + 跨维度热点 + 市场情绪）。
+4. **查看**：打开 `index.html` → 今日速览（动态主题 + 跨维度热点 + 内容类型筛选）。
 5. **标记**：感兴趣的 ⭐；想深挖的论文/项目点原文链接。
 6. **（每周）复盘**：看「⭐我的标记」分布 → 据此更新 `config/*.yaml`。
 
@@ -108,6 +116,8 @@
 - [ ] 时间窗口内（超窗口需 high 且标注）
 - [ ] 单源/不确定信息已标注
 - [ ] 跨维度热点的关联条目 id 真实存在
+- [ ] `content_type/relevance/impact/next_action` 使用允许值
+- [ ] 论文/技术报告保留原文 URL、日期和 venue/arXiv 信息
 
 ---
 

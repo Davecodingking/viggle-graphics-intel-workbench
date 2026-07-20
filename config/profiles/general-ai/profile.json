@@ -1,0 +1,26 @@
+{
+  "id": "general-ai",
+  "label_zh": "原作者泛 AI 情报",
+  "label_en": "General AI Intelligence",
+  "description": "保留原作者的泛 AI、KOL、论文、开源与 AI×金融配置。",
+  "config": {
+    "industry": "config/industry.yaml",
+    "sources": "config/sources.yaml",
+    "keywords": "config/keywords.yaml",
+    "kol": "config/kol.yaml",
+    "radar": "config/research_radar.yaml"
+  },
+  "dimensions": [
+    {"key": "lab", "cn": "AI 大厂动态", "en": "AI Labs", "icon": "lab", "color": "#2563eb", "overview": "AI 实验室与公司的官方研究、产品和战略动态。", "notes": "沿用原作者 sources 与 research radar。"},
+    {"key": "kol", "cn": "KOL 观点", "en": "KOL Insights", "icon": "kol", "color": "#7c3aed", "overview": "研究者与工程实践者的一手观点和讨论。", "notes": "沿用原作者 KOL 列表并执行 X-first。"},
+    {"key": "paper", "cn": "前沿论文", "en": "Frontier Papers", "icon": "paper", "color": "#0d9488", "overview": "近期值得深挖的 AI 论文和技术报告。", "notes": "沿用原作者论文来源与筛选方式。"},
+    {"key": "oss", "cn": "开源项目", "en": "Open Source", "icon": "oss", "color": "#ea580c", "overview": "活跃、有机制创新或可实际运行的开源项目。", "notes": "沿用原作者开源来源与筛选方式。"},
+    {"key": "fin", "cn": "AI × 金融", "en": "AI × Finance", "icon": "fin", "color": "#db2777", "overview": "AI 与金融、量化、加密和交易的交叉动态。", "notes": "沿用原作者行业 anchors 与金融雷达。"}
+  ],
+  "research_instructions": [
+    "沿用原作者五维度调研与 research-radar 优先级。",
+    "KOL 观点执行 X-first，目标至少 60% 条目带公开 X 证据。",
+    "AI×金融或加密锚定启用时，继续执行金融/量化 Agent 专项扫描。"
+  ],
+  "push_priority": ["kol", "oss", "fin"]
+}

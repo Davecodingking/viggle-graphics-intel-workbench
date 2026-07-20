@@ -1,0 +1,70 @@
+# Viggle 图形学与生成视频 profile：公开来源、按节奏扫描。
+meta:
+  version: 1
+  updated: 2026-07-20
+  profile: viggle-graphics
+
+dimensions:
+  video:
+    cn_name: 视频生成与人物动画
+    daily:
+      - { name: arXiv cs.CV, url: https://arxiv.org/list/cs.CV/recent, official: true }
+      - { name: arXiv cs.LG, url: https://arxiv.org/list/cs.LG/recent, official: true }
+      - { name: Hugging Face Papers, url: https://huggingface.co/papers }
+    conference:
+      - { name: CVF Open Access, url: https://openaccess.thecvf.com, official: true, venues: [CVPR, ICCV] }
+      - { name: ECCV, url: https://eccv.ecva.net, official: true }
+      - { name: OpenReview, url: https://openreview.net, official: true, venues: [ICLR] }
+      - { name: NeurIPS Proceedings, url: https://proceedings.neurips.cc, official: true }
+      - { name: ICML Proceedings, url: https://proceedings.mlr.press, official: true }
+      - { name: ACM Multimedia, url: https://dl.acm.org/conference/mm, official: true }
+
+  graphics:
+    cn_name: 图形学与 3D/4D
+    daily:
+      - { name: arXiv cs.GR, url: https://arxiv.org/list/cs.GR/recent, official: true }
+      - { name: arXiv cs.CV, url: https://arxiv.org/list/cs.CV/recent, official: true }
+    conference:
+      - { name: SIGGRAPH, url: https://www.siggraph.org/learn/conference-content, official: true }
+      - { name: SIGGRAPH Asia, url: https://asia.siggraph.org, official: true }
+      - { name: ACM TOG, url: https://dl.acm.org/journal/tog, official: true }
+      - { name: Eurographics Digital Library, url: https://diglib.eg.org, official: true, venues: [Eurographics, SGP, EGSR] }
+    monthly:
+      - { name: Computer Graphics Forum, url: https://onlinelibrary.wiley.com/journal/14678659, official: true }
+      - { name: IEEE TVCG, url: https://www.computer.org/csdl/journal/tg, official: true, focus: VR/AR、交互式 3D、Scientific Visualization、可视化系统 }
+
+  systems:
+    cn_name: 推理系统、GPU 与 Pipeline
+    conference:
+      - { name: MLSys, url: https://mlsys.org, official: true }
+      - { name: OSDI, url: https://www.usenix.org/conferences/byname/179, official: true }
+      - { name: NSDI, url: https://www.usenix.org/conferences/byname/155, official: true }
+      - { name: SOSP, url: https://sosp.org, official: true }
+      - { name: EuroSys, url: https://www.eurosys.org, official: true }
+      - { name: USENIX ATC, url: https://www.usenix.org/conferences/byname/131, official: true }
+      - { name: FAST, url: https://www.usenix.org/conferences/byname/146, official: true }
+    official_engineering:
+      - { name: NVIDIA Research, url: https://research.nvidia.com, official: true }
+      - { name: NVIDIA Developer Blog, url: https://developer.nvidia.com/blog, official: true }
+      - { name: PyTorch Blog, url: https://pytorch.org/blog, official: true }
+      - { name: Triton, url: https://github.com/triton-lang/triton, official: true }
+
+  eval:
+    cn_name: 评测、数据与安全
+    sources:
+      - { name: CVF Open Access, url: https://openaccess.thecvf.com, official: true }
+      - { name: Papers with Code, url: https://paperswithcode.com }
+      - { name: Hugging Face Datasets, url: https://huggingface.co/datasets }
+      - { name: IEEE TPAMI, url: https://www.computer.org/csdl/journal/tp, official: true }
+      - { name: IJCV, url: https://link.springer.com/journal/11263, official: true }
+      - { name: IEEE TMM, url: https://www.computer.org/csdl/journal/tm, official: true }
+
+  ecosystem:
+    cn_name: 开源、产品与产业生态
+    sources:
+      - { name: GitHub, url: https://github.com }
+      - { name: Hugging Face Models, url: https://huggingface.co/models }
+      - { name: Adobe Research, url: https://research.adobe.com, official: true }
+      - { name: Google DeepMind Research, url: https://deepmind.google/research, official: true }
+      - { name: Meta AI Research, url: https://ai.meta.com/research, official: true }
+      - { name: NVIDIA Research, url: https://research.nvidia.com, official: true }

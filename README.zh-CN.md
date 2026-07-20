@@ -4,6 +4,8 @@
 
 本项目是一个**本地优先、可开源安装部署**的每日 AI 行业情报工作台。它把配置化信源、X-first KOL 追踪、行业锚定、Agent 调研、结构化 digest、本地 HTML 工作台、机器人推送和本地定时任务串成一套可复用流程。
 
+当前默认启用 `viggle-graphics` profile，面向视频生成、人物动画、图形学与 3D/4D、推理系统/GPU Pipeline、评测安全和产业生态。原作者的泛 AI 工作流完整保留为 `general-ai`，原有 sources、keywords、KOL 和 radar 配置不删不改。
+
 只要你的 Agent 具备读取 skill/说明文档、运行本地脚本、设置或触发定时任务的能力，就可以使用这个仓库完成初始化、每日调研、看板更新和可选机器人推送。
 
 ![中文看板](assets/screenshots/dashboard-zh.png)
@@ -38,6 +40,8 @@ ai-intel-workbench/
 │   ├── research_radar.yaml                # 研究员长文/官方研究/国产模型/金融量化 Agent 雷达
 │   ├── push.yaml                          # Lark/飞书等机器人配置
 │   ├── runtime.yaml                       # 本地端口、agent 命令、定时配置
+│   ├── profiles/general-ai/profile.json   # 原作者工作流映射
+│   ├── profiles/viggle-graphics/          # Viggle 图形学 profile 与独立 YAML 配置
 │   └── secrets.example.env                # 本地密钥示例，不提交真实 secrets
 ├── data/
 │   ├── manifest.js                        # 历史 digest 清单
@@ -63,21 +67,21 @@ ai-intel-workbench/
 git clone https://github.com/weishao831/ai-intel-workbench.git
 cd ai-intel-workbench
 
-# 1. 初始化：行业、机器人、端口、可选 agent 命令
-python3 scripts/init.py
+# 1. 初始化默认 Viggle 图形学 profile
+python3 scripts/init.py --profile viggle-graphics
 
-# 非交互初始化示例：选择行业与产出语言
-python3 scripts/init.py --anchors ai-crypto,ai-finance --language zh --bot none
+# 临时切回原作者工作流；只有该 profile 使用行业 anchors
+python3 scripts/init.py --profile general-ai --anchors ai-crypto,ai-finance --language zh --bot none
 
 # 2. 打开本地工作台
 python3 scripts/serve.py --port 4318
 # 浏览器访问 http://127.0.0.1:4318/
 
 # 3. 校验内置样例
-python3 scripts/validate_digest.py --date latest
+python3 scripts/validate_digest.py --date latest --profile viggle-graphics
 
 # 4. 生成今天的调研任务
-python3 scripts/run_daily.py --date today
+python3 scripts/run_daily.py --date today --profile viggle-graphics
 ```
 
 如果没有配置 agent 命令，`run_daily.py` 会生成：
@@ -87,6 +91,72 @@ python3 scripts/run_daily.py --date today
 ```
 
 把这个 prompt 交给 Codex 或 Claude Code 执行，它会按 skill 说明完成调研，并用 canonical JSON 写回 `digest.js`。
+
+## Profile 与论文检索
+
+Profile 解析顺序为：CLI `--profile` → `config/runtime.yaml` 的 `active_profile` → `general-ai` 兼容默认。v1 每次只运行一个 profile。
+
+`viggle-graphics` 使用五个主题维度：`video`、`graphics`、`systems`、`eval`、`ecosystem`。论文不是单独维度，而是可跨主题筛选的 `content_type: paper`；看板可切换 All、Papers、Technical Reports、Repos/Models、News 和 KOL。
+
+论文雷达按节奏分层：每日扫描 arXiv `cs.CV/cs.GR/cs.LG`、官方研究页、项目页和 Hugging Face；每周或会期关注 CVPR、ICCV、ECCV、SIGGRAPH、SIGGRAPH Asia、TOG、ICLR、NeurIPS、ICML、MLSys、OSDI、NSDI、SOSP、ACM MM；每月或关键词触发时追踪 TPAMI、IJCV、TVCG、TMM、Computer Graphics Forum。TVCG 重点看 VR/AR、交互式 3D、Scientific Visualization 和可视化系统。
+
+具体源、关键词与“问题 × 方法 × 工程约束”查询矩阵位于 `config/profiles/viggle-graphics/`。
+
+## 如何测试
+
+### 1. 运行自动测试（不会写入正式历史）
+
+```bash
+python3 -m unittest discover -s tests -v
+python3 -m py_compile scripts/*.py
+```
+
+预期结果是全部测试显示 `ok`，最后输出 `OK`。
+
+### 2. 验证旧 digest 兼容性
+
+```bash
+python3 scripts/validate_digest.py --date 2026-06-29 --profile general-ai
+python3 scripts/validate_digest.py --date latest
+```
+
+两条命令都应以 `[validate] OK` 结束。第一条专门验证原作者旧版 digest；第二条验证当前 manifest 中的最新版。
+
+### 3. 在临时副本中查看 Viggle 动态看板
+
+下面的命令只修改系统临时目录，不会向本仓库的正式 `data/` 写入样例：
+
+```bash
+TMP_DIR="$(mktemp -d)"
+rsync -a --exclude .git --exclude .daily-intel ./ "$TMP_DIR/ai-intel-workbench/"
+cd "$TMP_DIR/ai-intel-workbench"
+
+python3 scripts/run_daily.py \
+  --date 2026-07-20 \
+  --profile viggle-graphics \
+  --from-json tests/fixtures/viggle_digest.json
+
+python3 scripts/serve.py --port 4319
+```
+
+浏览器打开 `http://127.0.0.1:4319/`，然后检查：
+
+- 左侧显示 video、graphics、systems、eval、ecosystem 五个动态主题。
+- 顶部 Papers 筛选后只剩三条论文样例。
+- ZH / EN 能切换界面语言。
+- 点击热点能看到四条关联内容。
+- 论文详情能看到 venue、方法、证据、局限、与 Viggle 的关系和建议实验。
+- 历史归档可以切换到 `2026-06-29`，旧条目仍能打开和收藏。
+
+测试结束后在终端按 `Ctrl+C` 停止本地服务。
+
+### 4. 测试真实每日入口
+
+```bash
+python3 scripts/run_daily.py --date today --profile viggle-graphics
+```
+
+如果尚未配置 `agent_command`，命令不会伪造资讯，而会在 `.daily-intel/runs/YYYY-MM-DD/research_prompt.md` 生成当日调研任务。推送和定时任务不会因为上述测试自动启用。
 
 ---
 

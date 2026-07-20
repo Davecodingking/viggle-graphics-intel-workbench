@@ -4,6 +4,8 @@
 
 Daily Intelligence Workbench is a **local-first, open-source deployable** workflow for daily AI industry intelligence. It combines configurable sources, X-first KOL tracking, a research radar for researcher longform and lab papers, industry anchors, agent-assisted research, structured digests, a local HTML dashboard, bot pushes, output-language selection, and local schedules.
 
+The default `viggle-graphics` profile targets video generation, human animation, graphics/3D/4D, inference systems and GPU pipelines, evaluation/safety, and the ecosystem. The author's original configuration is preserved without source deletion as the `general-ai` profile.
+
 Any agent runtime that can read a skill/instruction file, run local scripts, and trigger or install scheduled tasks can use this repository to initialize a workspace, produce daily intelligence, refresh the dashboard, and optionally push summaries to a bot.
 
 ![English dashboard](assets/screenshots/dashboard-en.png)
@@ -38,6 +40,8 @@ ai-intel-workbench/
 │   ├── research_radar.yaml
 │   ├── push.yaml
 │   ├── runtime.yaml
+│   ├── profiles/general-ai/profile.json
+│   ├── profiles/viggle-graphics/
 │   └── secrets.example.env
 ├── data/
 │   ├── manifest.js
@@ -63,21 +67,21 @@ ai-intel-workbench/
 git clone https://github.com/weishao831/ai-intel-workbench.git
 cd ai-intel-workbench
 
-# Initialize anchors, output language, bot, port, and optional agent command.
-python3 scripts/init.py
+# Initialize the default Viggle graphics profile.
+python3 scripts/init.py --profile viggle-graphics
 
-# Non-interactive example.
-python3 scripts/init.py --anchors ai-crypto,ai-finance --language en --bot none
+# Switch to the original workflow; industry anchors apply there.
+python3 scripts/init.py --profile general-ai --anchors ai-crypto,ai-finance --language en --bot none
 
 # Start the local dashboard.
 python3 scripts/serve.py --port 4318
 # Open http://127.0.0.1:4318/
 
 # Validate bundled sample data.
-python3 scripts/validate_digest.py --date latest
+python3 scripts/validate_digest.py --date latest --profile viggle-graphics
 
 # Generate today's research task.
-python3 scripts/run_daily.py --date today
+python3 scripts/run_daily.py --date today --profile viggle-graphics
 ```
 
 If no agent command is configured, `run_daily.py` writes:
@@ -87,6 +91,53 @@ If no agent command is configured, `run_daily.py` writes:
 ```
 
 Give that prompt to Codex or Claude Code. The agent should research, produce canonical JSON, and write it back with `run_daily.py --from-json`.
+
+## Profiles and Paper Discovery
+
+Profile precedence is CLI `--profile`, then `config/runtime.yaml` `active_profile`, then the backward-compatible `general-ai` fallback. In `viggle-graphics`, video, graphics, systems, eval, and ecosystem are topical dimensions; papers are a cross-topic `content_type` filter rather than a separate dimension.
+
+The radar scans arXiv `cs.CV/cs.GR/cs.LG`, official research/project pages, and Hugging Face daily; key vision, graphics, ML, multimedia, and systems venues weekly or around venue releases; and TPAMI, IJCV, TVCG, TMM, and Computer Graphics Forum monthly or on keyword triggers. TVCG is focused on VR/AR, interactive 3D, scientific visualization, and visualization systems. The full query matrix is under `config/profiles/viggle-graphics/`.
+
+## Testing
+
+Run the zero-write automated checks:
+
+```bash
+python3 -m unittest discover -s tests -v
+python3 -m py_compile scripts/*.py
+```
+
+Validate backward compatibility and the latest archived digest:
+
+```bash
+python3 scripts/validate_digest.py --date 2026-06-29 --profile general-ai
+python3 scripts/validate_digest.py --date latest
+```
+
+To inspect the Viggle dashboard without writing sample data into the repository's official history, create a temporary copy:
+
+```bash
+TMP_DIR="$(mktemp -d)"
+rsync -a --exclude .git --exclude .daily-intel ./ "$TMP_DIR/ai-intel-workbench/"
+cd "$TMP_DIR/ai-intel-workbench"
+
+python3 scripts/run_daily.py \
+  --date 2026-07-20 \
+  --profile viggle-graphics \
+  --from-json tests/fixtures/viggle_digest.json
+
+python3 scripts/serve.py --port 4319
+```
+
+Open `http://127.0.0.1:4319/`. Verify the five dynamic topics, Papers filter, ZH/EN switch, related hot-topic items, paper decision fields, archive switching, and legacy bookmarks. Press `Ctrl+C` to stop the server.
+
+The real daily entry point is:
+
+```bash
+python3 scripts/run_daily.py --date today --profile viggle-graphics
+```
+
+Without an `agent_command`, this creates `.daily-intel/runs/YYYY-MM-DD/research_prompt.md`; it does not invent a digest or enable push/scheduling.
 
 ---
 

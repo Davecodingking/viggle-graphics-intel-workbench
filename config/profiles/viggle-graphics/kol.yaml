@@ -1,0 +1,20 @@
+meta:
+  version: 1
+  profile: viggle-graphics
+  note: 仅作公开研究信号发现；最终条目必须回到论文、项目页或官方技术资料验证。
+
+official_labs:
+  - { handle: "NVIDIA Research", name: "NVIDIA Research", field: "图形学、视频生成、GPU 系统", platform: Web, status: keep }
+  - { handle: "Adobe Research", name: "Adobe Research", field: "视觉生成、图像视频编辑", platform: Web, status: keep }
+  - { handle: "Google DeepMind", name: "Google DeepMind", field: "生成模型、世界模型、视觉", platform: Web, status: keep }
+  - { handle: "Meta AI", name: "Meta AI Research", field: "视频、3D、感知与生成", platform: Web, status: keep }
+
+researchers:
+  - { handle: "@DrJimFan", name: "Jim Fan", field: "具身、世界模型、NVIDIA", platform: X, status: keep }
+  - { handle: "@drfeifei", name: "Fei-Fei Li", field: "空间智能、World Labs", platform: X, status: keep }
+  - { handle: "@ylecun", name: "Yann LeCun", field: "世界模型、表示学习", platform: X, status: watch }
+  - { handle: "@_akhaliq", name: "AK", field: "视觉论文与 demo 发现", platform: X, status: watch }
+
+discovery_rule: >
+  KOL 只负责发现新论文、项目和讨论；入选 digest 时优先使用 arXiv、顶会、项目页、
+  GitHub 或实验室官方页作为主 URL，X 只放入 x_src 或 buzz。

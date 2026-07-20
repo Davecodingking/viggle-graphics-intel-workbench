@@ -1,0 +1,42 @@
+meta:
+  version: 1
+  profile: viggle-graphics
+
+cadence:
+  daily:
+    - arXiv cs.CV / cs.GR / cs.LG keyword matrix
+    - Hugging Face Papers and official project pages
+    - Official lab research and engineering releases
+  weekly_or_venue_release:
+    - CVPR / ICCV / ECCV
+    - SIGGRAPH / SIGGRAPH Asia / ACM TOG
+    - ICLR / NeurIPS / ICML / ACM Multimedia
+    - MLSys / OSDI / NSDI / SOSP / EuroSys / USENIX ATC / FAST
+  monthly_or_keyword_triggered:
+    - IEEE TPAMI / IJCV
+    - IEEE TVCG / IEEE TMM
+    - Computer Graphics Forum
+
+selection_policy:
+  target_items: 10-15
+  minimum_per_dimension: 1
+  required_paper_coverage:
+    - at least one video or human-animation paper
+    - at least one graphics or 3D/4D paper
+    - at least one ML-systems or GPU paper
+  relevance:
+    direct: 可直接影响人物视频生成、动作迁移、身份或时序质量
+    transferable: 方法可迁移到 Viggle 的模型或图形 Pipeline
+    systems: 可影响延迟、吞吐、显存、稳定性、成本或开发效率
+    watch: 重要趋势但尚无明确实验入口
+  next_action: [deep_read, reproduce, prototype, watch]
+  impact: [quality, controllability, latency, throughput, memory, cost, reliability, developer_velocity, safety, data]
+
+paper_requirements:
+  - venue 或 arXiv 标识
+  - primary URL 与发布日期
+  - 方法与相对 baseline 的真实新增点
+  - 数据集、硬件、分辨率、帧数和延迟口径
+  - limitations 与精选 demo 风险
+  - 对 Viggle 的相关性
+  - 可在固定样本和固定硬件上执行的最小验证实验

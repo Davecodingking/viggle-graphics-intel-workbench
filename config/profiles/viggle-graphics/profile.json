@@ -1,0 +1,27 @@
+{
+  "id": "viggle-graphics",
+  "label_zh": "Viggle 图形学与生成视频",
+  "label_en": "Viggle Graphics & Generative Video",
+  "description": "面向 Backend Pipeline Engineer 的视频生成、图形学与 ML Systems 技术雷达。",
+  "config": {
+    "sources": "config/profiles/viggle-graphics/sources.yaml",
+    "keywords": "config/profiles/viggle-graphics/keywords.yaml",
+    "kol": "config/profiles/viggle-graphics/kol.yaml",
+    "radar": "config/profiles/viggle-graphics/research_radar.yaml"
+  },
+  "dimensions": [
+    {"key": "video", "cn": "视频生成与人物动画", "en": "Video Generation & Human Animation", "icon": "video", "color": "#5b5ce2", "overview": "人物动作、身份、时序质量与可控视频生成。", "notes": "每日扫 arXiv/Hugging Face，按会期追踪视觉与生成会议。"},
+    {"key": "graphics", "cn": "图形学与 3D/4D", "en": "Graphics & 3D/4D", "icon": "cube", "color": "#0d9488", "overview": "神经渲染、3D/4D 表示、Avatar、重建与动画。", "notes": "重点关注 SIGGRAPH/TOG、3DGS、Neural Rendering 与动态表示。"},
+    {"key": "systems", "cn": "推理系统、GPU 与 Pipeline", "en": "Inference Systems, GPU & Pipelines", "icon": "cpu", "color": "#2563eb", "overview": "Serving、调度、显存、吞吐、视频编解码与可靠性。", "notes": "重点关注 MLSys 与系统会议、GPU runtime、codec 和端到端性能。"},
+    {"key": "eval", "cn": "评测、数据与安全", "en": "Evaluation, Data & Safety", "icon": "shield", "color": "#db2777", "overview": "人物视频 benchmark、数据覆盖、failure taxonomy 与安全。", "notes": "指标必须能映射到失败分类、回归样本与发布门槛。"},
+    {"key": "ecosystem", "cn": "开源、产品与产业生态", "en": "Open Source, Product & Ecosystem", "icon": "oss", "color": "#ea580c", "overview": "可复用模型、仓库、工具链和产业信号。", "notes": "优先官方仓库、模型卡、项目页与可复现工程证据。"}
+  ],
+  "research_instructions": [
+    "以问题 × 方法 × 工程约束的组合查询发现候选，不按期刊目录全量搬运。",
+    "每日扫描 arXiv cs.CV/cs.GR/cs.LG、官方研究页、项目页与 Hugging Face；每周或会期扫描顶会；每月扫描重点期刊。",
+    "论文跨主题归类，使用 content_type=paper 或 technical_report，不设置独立论文维度。",
+    "优先能影响人物视频质量、可控性、时序一致性、GPU 延迟、吞吐、显存、稳定性或成本的工作。",
+    "入选论文必须写明 venue/arXiv、证据、局限、对 Viggle 的相关性和最小验证实验。"
+  ],
+  "push_priority": ["video", "systems", "graphics"]
+}

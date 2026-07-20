@@ -4,6 +4,8 @@
 
 AI Intel Workbench is a **local-first, open-source daily intelligence workflow for agents**. It helps Codex, Claude Code, or any skill-capable agent collect and structure daily AI + user-defined industry signals, then review them in a visual local dashboard.
 
+The default `viggle-graphics` profile targets video generation, human animation, graphics/3D/4D, inference systems and GPU pipelines, evaluation/safety, and the surrounding ecosystem. The author's original workflow and source files remain intact as the `general-ai` profile.
+
 Use it to track AI lab updates, X-first KOL opinions, frontier papers, open-source projects, and AI x finance / crypto / any configured industry. It includes configurable sources, a 59-person default KOL seed list, a research radar for researcher longform and lab papers, industry anchors, structured digests, output-language selection, a zero-dependency HTML workbench, optional Lark/Feishu bot pushes, and local scheduled runs.
 
 ![English dashboard](assets/screenshots/dashboard-en.png)
@@ -27,21 +29,21 @@ No personal webhook, cookie, token, API key, or X/Twitter session state is commi
 git clone https://github.com/weishao831/ai-intel-workbench.git
 cd ai-intel-workbench
 
-# Initialize anchors, output language, bot, port, and optional agent command.
-python3 scripts/init.py
+# Initialize the default Viggle graphics profile.
+python3 scripts/init.py --profile viggle-graphics
 
-# Non-interactive example.
-python3 scripts/init.py --anchors ai-crypto,ai-finance --language en --bot none
+# Switch to the original workflow; industry anchors apply to general-ai.
+python3 scripts/init.py --profile general-ai --anchors ai-crypto,ai-finance --language en --bot none
 
 # Start the local dashboard.
 python3 scripts/serve.py --port 4318
 # Open http://127.0.0.1:4318/
 
 # Validate bundled sample data.
-python3 scripts/validate_digest.py --date latest
+python3 scripts/validate_digest.py --date latest --profile viggle-graphics
 
 # Generate today's research task.
-python3 scripts/run_daily.py --date today
+python3 scripts/run_daily.py --date today --profile viggle-graphics
 ```
 
 If no agent command is configured, `run_daily.py` writes:
@@ -51,6 +53,25 @@ If no agent command is configured, `run_daily.py` writes:
 ```
 
 Give that prompt to Codex, Claude Code, or another agent runtime. The agent should research, produce canonical JSON, and write it back with `run_daily.py --from-json`.
+
+## Profiles and Paper Discovery
+
+Profile precedence is CLI `--profile`, then `config/runtime.yaml` `active_profile`, then the backward-compatible `general-ai` default. The Viggle profile uses five topical dimensions—video, graphics, systems, eval, and ecosystem—while papers remain a cross-topic `content_type` filter.
+
+Its radar checks arXiv `cs.CV/cs.GR/cs.LG`, official research/project pages, and Hugging Face daily; major graphics, vision, ML, multimedia, and systems venues weekly or around conference cycles; and TPAMI, IJCV, TVCG, TMM, and Computer Graphics Forum monthly or on keyword triggers. The source lists and problem × method × engineering-constraint query matrix live under `config/profiles/viggle-graphics/`.
+
+## Testing
+
+Run automated and compatibility checks without modifying archived data:
+
+```bash
+python3 -m unittest discover -s tests -v
+python3 -m py_compile scripts/*.py
+python3 scripts/validate_digest.py --date 2026-06-29 --profile general-ai
+python3 scripts/validate_digest.py --date latest
+```
+
+For the full temporary-copy dashboard smoke test and UI checklist, see [Testing in the full English guide](README.en.md#testing) or [中文测试说明](README.zh-CN.md#如何测试).
 
 ## Output Language
 

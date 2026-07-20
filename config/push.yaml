@@ -7,7 +7,7 @@ bot_type: lark
 webhook: ""
 hot_topics: 5             # 推送几条「今日热点」
 per_dimension: 1          # 普通维度每维度推送几条
-top3_dimensions: kol,oss,fin   # 这些维度推「每日 Top3」（KOL 观点 / 开源项目 / AI×金融）
+top_dimensions:           # 留空则使用 profile.json 的 push_priority
 title_prefix: "AI 每日情报"
 note: 开源默认不内置 webhook。运行 scripts/init.py 或手动写入本机 config/push.yaml 后再启用推送。
 

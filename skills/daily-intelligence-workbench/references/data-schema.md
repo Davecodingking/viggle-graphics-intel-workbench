@@ -20,13 +20,17 @@ The deterministic writer also accepts canonical JSON:
   "date": "2026-06-29",
   "date_cn": "2026年6月29日 · 周一",
   "generated_at": "2026-06-29",
+  "profile": "viggle-graphics",
   "language": "zh",
   "refresh_note": "Short generation note",
   "market_mood": "Optional market/context paragraph",
   "dimensions": [
     {
-      "key": "lab",
-      "cn": "AI 大厂动态",
+      "key": "video",
+      "cn": "视频生成与人物动画",
+      "en": "Video Generation & Human Animation",
+      "icon": "video",
+      "color": "#8b5cf6",
       "overview": "Dimension overview",
       "notes": "Source quality notes"
     }
@@ -42,8 +46,8 @@ The deterministic writer also accepts canonical JSON:
   ],
   "items": [
     {
-      "id": "lab-1",
-      "dim": "lab",
+      "id": "video-1",
+      "dim": "video",
       "title": "Chinese title",
       "orig": "Original title",
       "source": "Source name",
@@ -53,6 +57,9 @@ The deterministic writer also accepts canonical JSON:
       "tags": ["tag"],
       "summary": "Plain Chinese summary",
       "detail": "Detailed explanation",
+      "method": "What the paper or report actually changes",
+      "evidence": "Datasets, baselines, hardware, metrics, or other supporting evidence",
+      "viggle_relation": "Why this is direct, transferable, systems-relevant, or only worth watching",
       "why": "Why it matters",
       "why_now": "Why now",
       "buzz": "Community discussion",
@@ -63,6 +70,10 @@ The deterministic writer also accepts canonical JSON:
       "examples": ["Concrete example"],
       "product_implications": ["Product or workflow implication"],
       "limitations": ["What not to over-infer"],
+      "relevance": "direct | transferable | systems | watch",
+      "impact": ["quality | controllability | latency | throughput | memory | cost | reliability | developer_velocity | safety | data"],
+      "next_action": "deep_read | reproduce | prototype | watch",
+      "experiment": "Optional concrete experiment",
       "meta": {}
     }
   ],
@@ -73,10 +84,14 @@ The deterministic writer also accepts canonical JSON:
 
 ## Required Fields
 
-- Root: `date`, `date_cn`, `generated_at`, `dimensions`, `hot_topics_today`, `items`
-- Dimension: `key`, `cn`, `overview`
+- Root: `date`, `date_cn`, `generated_at`, `profile`, `dimensions`, `hot_topics_today`, `items`
+- Dimension: `key`, `cn`, `en`, `icon`, `color`, `overview`, `notes`
 - Hot topic: `title`, `summary`, `related`
 - Item: `id`, `dim`, `title`, `source`, `url`, `date`, `summary`, `detail`
+
+For `viggle-graphics`, each item also requires `content_type`, `relevance`, `impact`, and `next_action`. Paper and technical-report entries require an original URL, publication date, and `meta.venue` or `meta.arxiv`.
+
+Legacy digests without `profile` or the newer decision fields remain readable and are interpreted with `general-ai` compatibility defaults; they do not need to be migrated.
 
 ## Longform / Research Item Expectations
 
@@ -90,6 +105,8 @@ Deep items should include:
 - `examples`: 1-3 concrete examples or analogies when the content is abstract.
 - `product_implications`: what this means for AI product, agent engineering, evaluation, open-source adoption, or the configured industry anchors.
 - `limitations`: caveats, uncertainties, or where the author may be overclaiming.
+
+For papers and technical reports, also prefer `method`, `evidence`, `viggle_relation`, and `experiment` so the detail modal separates the claim, its support, product relevance, and the smallest useful verification.
 
 Do not compress a high-value longform item into a short news blurb. If the item is included because of a long article, the dashboard should preserve enough structure to be useful offline.
 
@@ -112,6 +129,9 @@ Keep technical names, source names, product names, tickers, and URLs unchanged u
 - Every `hot_topics_today[].related` id should exist in `items[].id`.
 - Every item should have a reachable or intentionally marked URL.
 - Every item should include a dimension present in `dimensions[].key`.
+- `dimensions[].key` values and item IDs must be unique.
+- `content_type`, `relevance`, `impact`, and `next_action` must use the allowed values shown above.
+- A `viggle-graphics` digest must cover all five profile dimensions and include paper coverage in video, graphics, and systems.
 - Public claims that are single-source, stale, or approximate should be disclosed in `notes`, `buzz`, or `detail`.
 
 ## Writing Files
@@ -119,11 +139,11 @@ Keep technical names, source names, product names, tickers, and URLs unchanged u
 Prefer:
 
 ```bash
-python3 scripts/run_daily.py --date 2026-06-29 --from-json out/digest.json
+python3 scripts/run_daily.py --date 2026-06-29 --profile viggle-graphics --from-json out/digest.json
 ```
 
 Then validate:
 
 ```bash
-python3 scripts/validate_digest.py --date 2026/06/29
+python3 scripts/validate_digest.py --date 2026/06/29 --profile viggle-graphics
 ```

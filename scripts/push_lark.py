@@ -9,6 +9,8 @@
 import re, json, sys, os, urllib.request
 import time, hmac, hashlib, base64
 
+from profiles import load_profile
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 def read(p): return open(p, encoding="utf-8").read()
 
@@ -124,10 +126,30 @@ else:
             t = re.search(prop("title") + r'"([^"]*)"', line); s = re.search(prop("summary") + r'"([^"]*)"', line)
             if t: hots.append((t.group(1), s.group(1) if s else ""))
 
-# 各维度精选（top3_dimensions 配置的维度出 Top3，其余 per_dimension 条）
-DIM = [("lab", "🏢 AI 大厂"), ("kol", "🗣️ KOL 观点"), ("paper", "📄 前沿论文"),
-       ("oss", "🧩 开源项目"), ("fin", "💰 AI×金融")]
-top3_dims = [s.strip() for s in cfg_get("top3_dimensions", "kol,oss,fin").split(",") if s.strip()]
+# 各维度精选：严格 JSON digest 使用动态维度，legacy digest 回退旧五维。
+legacy_dims = [("lab", "🏢 AI 大厂"), ("kol", "🗣️ KOL 观点"), ("paper", "📄 前沿论文"),
+               ("oss", "🧩 开源项目"), ("fin", "💰 AI×金融")]
+emoji = {"video": "🎬", "cube": "🧊", "cpu": "⚙️", "shield": "🛡️", "oss": "🧩",
+         "lab": "🏢", "kol": "🗣️", "paper": "📄", "fin": "💰"}
+if payload_data and payload_data.get("dimensions"):
+    DIM = [
+        (dim.get("key"), "%s %s" % (emoji.get(dim.get("icon"), "•"), dim.get("cn") or dim.get("en") or dim.get("key")))
+        for dim in payload_data.get("dimensions")
+        if dim.get("key")
+    ]
+else:
+    DIM = legacy_dims
+
+configured_top = cfg_get("top_dimensions")
+if configured_top:
+    top3_dims = [s.strip() for s in configured_top.split(",") if s.strip()]
+elif payload_data and payload_data.get("profile"):
+    try:
+        top3_dims = load_profile(payload_data["profile"]).get("push_priority") or []
+    except ValueError:
+        top3_dims = []
+else:
+    top3_dims = ["kol", "oss", "fin"]
 per_dim = int(re.sub(r"\D", "", cfg_get("per_dimension", "1")) or 1)
 dim_items = {}
 if payload_data:
@@ -150,7 +172,7 @@ def build_lark_card():
     for t, s in hots[:n_hot]:
         el.append({"tag": "div", "text": {"tag": "lark_md", "content": "**· " + safe(t) + "**\n" + safe(s)[:90]}})
     el.append({"tag": "hr"})
-    el.append({"tag": "div", "text": {"tag": "lark_md", "content": "**📌 各维度精选**（KOL / 开源 / 金融出 Top3）"}})
+    el.append({"tag": "div", "text": {"tag": "lark_md", "content": "**📌 各维度精选**"}})
     for k, cn in DIM:
         items = dim_items.get(k, [])
         n = 3 if k in top3_dims else per_dim
@@ -168,7 +190,7 @@ def build_lark_card():
             link = "  [原文](" + u + ")" if u else ""
             el.append({"tag": "div", "text": {"tag": "lark_md", "content": cn + "　" + safe(t) + link}})
     el.append({"tag": "hr"})
-    el.append({"tag": "note", "elements": [{"tag": "lark_md", "content": "AI 每日情报工作台 · 仅辅助分析、不构成投资建议 · 以原文为准"}]})
+    el.append({"tag": "note", "elements": [{"tag": "lark_md", "content": "每日情报工作台 · 仅作辅助分析 · 以一手原文为准"}]})
     return {"msg_type": "interactive", "card": {
         "config": {"wide_screen_mode": True},
         "header": {"title": {"tag": "plain_text", "content": "🛰️ " + cfg_get("title_prefix", "AI 每日情报") + " · " + date_cn + " 精华"}, "template": "blue"},
@@ -193,7 +215,7 @@ def mask_hook(hook):
     return "<lark-webhook:%s...%s>" % (token[:4], token[-4:])
 
 dry_run = "--dry-run" in args
-print("[push] %s 维度(KOL/开源/金融 Top3) + %d 条热点 → %d 个机器人" % (len(dim_items), min(n_hot, len(hots)), len(webhooks)))
+print("[push] %s 个动态维度 + %d 条热点 → %d 个机器人" % (len(dim_items), min(n_hot, len(hots)), len(webhooks)))
 if dry_run:
     for i, hook in enumerate(webhooks, 1):
         print("[push][dry-run] bot#%d %s" % (i, mask_hook(hook)))

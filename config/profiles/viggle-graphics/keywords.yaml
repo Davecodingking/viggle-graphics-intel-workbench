@@ -1,0 +1,73 @@
+meta:
+  version: 1
+  profile: viggle-graphics
+
+query_matrix:
+  problems:
+    - human video generation
+    - human animation
+    - character animation
+    - motion transfer
+    - pose-guided video generation
+    - identity preservation
+    - temporal consistency
+    - long video generation
+    - neural rendering
+    - animatable avatar
+    - dynamic novel view synthesis
+    - inverse rendering
+    - video generation evaluation
+  methods:
+    - video diffusion transformer
+    - flow matching
+    - latent video diffusion
+    - few-step generation
+    - distillation
+    - 3D Gaussian Splatting
+    - dynamic Gaussian Splatting
+    - 4D representation
+    - neural avatar
+    - sequence parallelism
+    - quantization
+    - model offloading
+  constraints:
+    - real-time
+    - streaming
+    - low latency
+    - memory efficient
+    - high resolution
+    - long duration
+    - production
+    - GPU scheduling
+    - fault tolerance
+    - NVENC
+    - NVDEC
+    - video codec
+
+must_run_queries:
+  - 'site:arxiv.org ("human animation" OR "motion transfer") (video OR diffusion)'
+  - 'site:arxiv.org ("identity preservation" OR "temporal consistency") "video generation"'
+  - 'site:arxiv.org ("Gaussian Splatting" OR "neural rendering") (dynamic OR human OR avatar)'
+  - 'site:mlsys.org (diffusion OR video OR visual) (serving OR GPU OR inference)'
+  - '("video generation" OR diffusion) (serving OR streaming OR scheduling OR batching) GPU'
+
+topic_tags:
+  - { tag: 人物动画, match: [human animation, character animation, motion transfer, pose-guided] }
+  - { tag: 身份一致性, match: [identity preservation, personalization, subject consistency] }
+  - { tag: 时序一致性, match: [temporal consistency, flicker, long video] }
+  - { tag: 可控视频, match: [controllable video, trajectory, camera control, motion control] }
+  - { tag: Neural Rendering, match: [neural rendering, novel view synthesis, inverse rendering] }
+  - { tag: 3DGS, match: [Gaussian Splatting, 3DGS, dynamic Gaussian] }
+  - { tag: Avatar, match: [avatar, talking head, human reconstruction, 4D human] }
+  - { tag: 推理加速, match: [inference acceleration, distillation, few-step, quantization] }
+  - { tag: GPU系统, match: [GPU scheduling, CUDA, Triton, sequence parallel, offload] }
+  - { tag: 视频Pipeline, match: [NVENC, NVDEC, FFmpeg, codec, pipeline, streaming] }
+  - { tag: 评测数据, match: [benchmark, dataset, evaluation, human preference] }
+
+filters:
+  date_window_days: 21
+  max_items_total: 15
+  max_items_per_dimension: 4
+  require_primary_url: true
+  prefer_code_or_project_page: true
+  drop: [招聘, hiring, sponsored, 纯营销, 无方法细节的产品宣传]
