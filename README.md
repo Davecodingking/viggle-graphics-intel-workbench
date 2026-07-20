@@ -26,8 +26,8 @@ No personal webhook, cookie, token, API key, or X/Twitter session state is commi
 ## Quick Start
 
 ```bash
-git clone https://github.com/weishao831/ai-intel-workbench.git
-cd ai-intel-workbench
+git clone https://github.com/Davecodingking/viggle-graphics-intel-workbench.git
+cd viggle-graphics-intel-workbench
 
 # Initialize the default Viggle graphics profile.
 python3 scripts/init.py --profile viggle-graphics

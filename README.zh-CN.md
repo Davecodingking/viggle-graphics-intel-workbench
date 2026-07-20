@@ -64,8 +64,8 @@ ai-intel-workbench/
 ## 快速开始
 
 ```bash
-git clone https://github.com/weishao831/ai-intel-workbench.git
-cd ai-intel-workbench
+git clone https://github.com/Davecodingking/viggle-graphics-intel-workbench.git
+cd viggle-graphics-intel-workbench
 
 # 1. 初始化默认 Viggle 图形学 profile
 python3 scripts/init.py --profile viggle-graphics
