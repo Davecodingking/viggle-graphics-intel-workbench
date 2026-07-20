@@ -1,5 +1,6 @@
 import json
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -8,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from profiles import active_profile_id, available_profiles, load_profile  # noqa: E402
+import run_daily  # noqa: E402
 from run_daily import merge_dimensions  # noqa: E402
 
 
@@ -41,6 +43,26 @@ class ProfileTests(unittest.TestCase):
         dimensions = merge_dimensions(payload["dimensions"], profile)
         self.assertEqual([dim["key"] for dim in dimensions], ["video", "graphics", "systems", "eval", "ecosystem"])
         self.assertTrue(all(dim.get("en") and dim.get("icon") and dim.get("color") and dim.get("notes") for dim in dimensions))
+
+    def test_manifest_writer_adds_profile_and_preserves_legacy_entries(self):
+        original_root = run_daily.ROOT
+        try:
+            with tempfile.TemporaryDirectory() as tmp:
+                run_daily.ROOT = Path(tmp)
+                manifest = run_daily.ROOT / "data" / "manifest.js"
+                manifest.parent.mkdir(parents=True)
+                manifest.write_text(
+                    'window.__MANIFEST__ = { dates: [\n'
+                    '  { date: "2026/06/29", label: "2026年6月29日", count: 44, file: "data/2026/06/29/digest.js" }\n'
+                    '] };\n',
+                    encoding="utf-8",
+                )
+                run_daily.update_manifest("2026-07-20", 8, "viggle-graphics")
+                output = manifest.read_text(encoding="utf-8")
+                self.assertIn('profile: "general-ai"', output)
+                self.assertIn('profile: "viggle-graphics"', output)
+        finally:
+            run_daily.ROOT = original_root
 
 
 if __name__ == "__main__":

@@ -96,6 +96,10 @@ Give that prompt to Codex or Claude Code. The agent should research, produce can
 
 Profile precedence is CLI `--profile`, then `config/runtime.yaml` `active_profile`, then the backward-compatible `general-ai` fallback. In `viggle-graphics`, video, graphics, systems, eval, and ecosystem are topical dimensions; papers are a cross-topic `content_type` filter rather than a separate dimension.
 
+The dashboard header switches between Graphics and the original AI + Finance profile. Switching opens the latest digest for that profile and scopes the archive, recent-frequency view, and saved items to it. Each manifest entry carries a `profile`; legacy entries without one default to `general-ai`.
+
+The original AI x Finance dimension is not a stock-picking feed. It tracks how AI changes research, quant workflows, trading, payments, risk, and regulation, plus how chips, compute, and AI products flow through to public companies and markets. The original dimension and source structure remain intact, and the output is intelligence rather than investment advice.
+
 The radar scans arXiv `cs.CV/cs.GR/cs.LG`, official research/project pages, and Hugging Face daily; key vision, graphics, ML, multimedia, and systems venues weekly or around venue releases; and TPAMI, IJCV, TVCG, TMM, and Computer Graphics Forum monthly or on keyword triggers. TVCG is focused on VR/AR, interactive 3D, scientific visualization, and visualization systems. The full query matrix is under `config/profiles/viggle-graphics/`.
 
 ## Testing

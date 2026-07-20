@@ -58,6 +58,8 @@ Give that prompt to Codex, Claude Code, or another agent runtime. The agent shou
 
 Profile precedence is CLI `--profile`, then `config/runtime.yaml` `active_profile`, then the backward-compatible `general-ai` default. The Viggle profile uses five topical dimensions—video, graphics, systems, eval, and ecosystem—while papers remain a cross-topic `content_type` filter.
 
+Use the dashboard header to switch between Graphics and the original AI + Finance profile. The latter is not a stock-picking feed: it tracks AI in research, quant workflows, trading, payments, risk, and regulation, together with the market transmission of chips, compute, and AI products. Legacy manifest entries remain compatible and default to `general-ai`.
+
 Its radar checks arXiv `cs.CV/cs.GR/cs.LG`, official research/project pages, and Hugging Face daily; major graphics, vision, ML, multimedia, and systems venues weekly or around conference cycles; and TPAMI, IJCV, TVCG, TMM, and Computer Graphics Forum monthly or on keyword triggers. The source lists and problem × method × engineering-constraint query matrix live under `config/profiles/viggle-graphics/`.
 
 ## Testing

@@ -75,6 +75,9 @@
     font-size:12.5px;font-weight:500;font-family:inherit;transition:.12s}
   .seg button:hover{color:var(--text)}
   .seg button.on{background:#fff;color:var(--text);box-shadow:0 1px 3px rgba(20,28,54,.1)}
+  .profileseg{border-color:var(--accent-line);background:var(--accent-soft)}
+  .profileseg button{white-space:nowrap;color:#5552a8}
+  .profileseg button.on{color:var(--accent);font-weight:650}
   .type-filter{height:34px;max-width:155px;border:1px solid var(--border);border-radius:9px;background:var(--surface);
     color:var(--text2);font:inherit;font-size:11.5px;padding:0 28px 0 10px;cursor:pointer}
   .content{padding:26px 30px 70px;max-width:1200px;width:100%}
@@ -288,6 +291,10 @@
         <div class="tt" id="vTitle">今日速览</div>
         <div class="td" id="vDate"></div>
       </div>
+      <div class="seg profileseg" id="profileseg" aria-label="Profile">
+        <button data-profile="viggle-graphics" onclick="setProfile('viggle-graphics')">图形学</button>
+        <button data-profile="general-ai" onclick="setProfile('general-ai')">原版 AI＋金融</button>
+      </div>
       <div class="grow"></div>
       <label class="search"><svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="q" placeholder="搜索标题 / 摘要 / 标签…" oninput="onSearch(this.value)"></label>
       <div class="seg" id="seg">
@@ -367,7 +374,9 @@ var I18N={
     only_days:"目前仅有",need_days:"天数据，跨天高频需累积 ≥ 2 天后自动生效。今日标签热度 Top：",
     kol_watch:"KOL 关注名单",kol_config:"可在 config/kol.yaml 维护",people:"人",x_accounts:"个 X 账号",domestic:"其余国内(微博/即刻)",practice:"今日可借鉴实践",hot_discussions:"热门讨论议题",
     ai_trading:"AI+交易",filter_all:"全部类型",filter_papers:"论文",filter_reports:"技术报告",filter_repos:"仓库 / 模型",filter_news:"资讯 / 分析",filter_kol:"KOL / 长文",
-    venue:"发表/来源",arxiv:"arXiv",relevance:"相关性",impact:"影响",next_action:"下一步",experiment:"建议实验",method:"方法",evidence:"证据",viggle_relation:"与 Viggle 的关系",profile:"当前 Profile"
+    venue:"发表/来源",arxiv:"arXiv",relevance:"相关性",impact:"影响",next_action:"下一步",experiment:"建议实验",method:"方法",evidence:"证据",viggle_relation:"与 Viggle 的关系",profile:"当前 Profile",
+    profile_graphics:"图形学",profile_general:"原版 AI＋金融",profile_empty:"这个 Profile 还没有归档数据。",
+    finance_explain:"“AI × 金融”不是普通荐股栏目：它追踪 AI 如何进入投研、量化、交易、支付、风控与监管，也关注芯片、算力和 AI 产品变化如何传导到上市公司与市场。保留原作者栏目结构，仅作技术与产业情报，不构成投资建议。"
   },
   en:{
     doc_title:"AI Intel Workbench",brand:"AI Intel Workbench",brand_sub:"DAILY INTELLIGENCE",
@@ -386,7 +395,9 @@ var I18N={
     only_days:"Only",need_days:"days of data so far. Cross-day trends activate after 2+ days. Today's top tags:",
     kol_watch:"KOL Watchlist",kol_config:"Maintained in config/kol.yaml",people:"people",x_accounts:"X accounts",domestic:"others on domestic platforms",practice:"Practices to Borrow",hot_discussions:"Hot Discussion Topics",
     ai_trading:"AI trading",filter_all:"All content",filter_papers:"Papers",filter_reports:"Technical reports",filter_repos:"Repos / models",filter_news:"News / analysis",filter_kol:"KOL / longform",
-    venue:"Venue",arxiv:"arXiv",relevance:"Relevance",impact:"Impact",next_action:"Next action",experiment:"Suggested experiment",method:"Method",evidence:"Evidence",viggle_relation:"Relevance to Viggle",profile:"Profile"
+    venue:"Venue",arxiv:"arXiv",relevance:"Relevance",impact:"Impact",next_action:"Next action",experiment:"Suggested experiment",method:"Method",evidence:"Evidence",viggle_relation:"Relevance to Viggle",profile:"Profile",
+    profile_graphics:"Graphics",profile_general:"Original AI + Finance",profile_empty:"This profile has no archived digest yet.",
+    finance_explain:"AI x Finance is not a stock-picking feed. It tracks how AI changes research, quant workflows, trading, payments, risk and regulation, plus how chips, compute and AI products flow through to public companies and markets. The original structure is preserved for technical and industry intelligence only, not investment advice."
   }
 };
 function T(k){return (I18N[UI_LANG]&&I18N[UI_LANG][k])||I18N.zh[k]||k;}
@@ -402,6 +413,10 @@ function applyLangShell(){
     tf.innerHTML=opts.map(function(o){return '<option value="'+o[0]+'">'+T(o[1])+'</option>';}).join("");tf.value=state.type;
   }
   document.querySelectorAll("#langseg button").forEach(function(b){b.classList.toggle("on",b.dataset.lang===UI_LANG);});
+  document.querySelectorAll("#profileseg button").forEach(function(b){
+    b.textContent=b.dataset.profile==="viggle-graphics"?T("profile_graphics"):T("profile_general");
+    b.classList.toggle("on",b.dataset.profile===state.profile);
+  });
   var sf=document.querySelector(".side-foot");if(sf)sf.innerHTML=T("data_dir")+' <b>data/</b><br><span id="footdate"></span>';
 }
 function setLang(lang){
@@ -432,7 +447,16 @@ function dimMeta(d,key){
 }
 function syncDims(d){DIM={};dimsFor(d).forEach(function(raw){DIM[raw.key]=dimMeta(d,raw.key);});}
 var MANIFEST=window.__MANIFEST__||{dates:[]};
-var state={date:MANIFEST.latest,view:"overview",q:"",heat:"all",type:"all"};
+var PROFILE_IDS=["viggle-graphics","general-ai"];
+var PROFILE_KEY="ai_daily_profile_v1";
+function entryProfile(entry){return (entry&&entry.profile)||"general-ai";}
+function profileDates(profile){return (MANIFEST.dates||[]).filter(function(entry){return entryProfile(entry)===profile;});}
+function latestProfileDate(profile){var dates=profileDates(profile);return dates.length?dates[dates.length-1].date:null;}
+function profileForDate(date){var entry=(MANIFEST.dates||[]).filter(function(row){return row.date===date;})[0];return entryProfile(entry);}
+var requestedProfile=(new URLSearchParams(location.search).get("profile")||localStorage.getItem(PROFILE_KEY)||"").toLowerCase();
+if(PROFILE_IDS.indexOf(requestedProfile)<0)requestedProfile=profileForDate(MANIFEST.latest);
+if(PROFILE_IDS.indexOf(requestedProfile)<0)requestedProfile="viggle-graphics";
+var state={profile:requestedProfile,date:latestProfileDate(requestedProfile)||MANIFEST.latest,view:"overview",q:"",heat:"all",type:"all"};
 var MK="ai_daily_marks_v2";
 var modalStack=[];
 
@@ -455,6 +479,17 @@ function toggleMark(date,id,ev){
   renderNav();
   if(state.view==="marks")render();
 }
+function setProfile(profile){
+  if(PROFILE_IDS.indexOf(profile)<0||profile===state.profile)return;
+  var date=latestProfileDate(profile);
+  if(!date){alert(T("profile_empty"));return;}
+  loadDigest(date,function(){
+    state.profile=profile;state.date=date;state.view="overview";state.type="all";state.heat="all";state.q="";
+    localStorage.setItem(PROFILE_KEY,profile);
+    var q=document.getElementById("q");if(q)q.value="";
+    window.scrollTo(0,0);render();
+  });
+}
 
 /* ---------- 导航 ---------- */
 function navCfg(){
@@ -469,7 +504,7 @@ function navCfg(){
   dimsFor(d).forEach(function(raw){var dm=DIM[raw.key]||dimMeta(d,raw.key);rows.push({v:raw.key,ic:dm.ic,t:dm.cn,c:counts[raw.key]||0});});
   rows=rows.concat([{sec:T("sec_mine")},
     {v:"marks",ic:"star",t:T("marks"),c:Object.keys(getMarks()).length},
-    {v:"history",ic:"cal",t:T("history"),c:(MANIFEST.dates||[]).length},
+    {v:"history",ic:"cal",t:T("history"),c:profileDates(state.profile).length},
     {v:"about",ic:"info",t:T("about")}
   ]);
   return rows;
@@ -545,6 +580,7 @@ function render(){
 function renderOverview(d){
   var h="";
   if(d.refresh_note)h+='<div class="hero-note">'+ico('refresh')+'<span>'+esc(d.refresh_note)+'</span></div>';
+  if((d.profile||"general-ai")==="general-ai")h+='<div class="note tip">'+T("finance_explain")+'</div>';
   h+='<div class="stats">'+
     '<div class="stat hl"><div class="n">'+d.items.length+'</div><div class="l">'+T("items")+'</div></div>'+
     '<div class="stat"><div class="n">'+dimsFor(d).length+'</div><div class="l">'+T("dims")+'</div></div>'+
@@ -622,7 +658,7 @@ function todayTags(d){
   return Object.keys(c).sort(function(a,b){return c[b]-c[a]}).slice(0,10).map(function(t){return '<span class="tag" style="margin:0 4px 4px 0;display:inline-block">'+esc(t)+' · '+c[t]+'</span>'}).join("");
 }
 function computeTrending(){
-  var dates=(MANIFEST.dates||[]).slice(0,7),seen={};
+  var dates=profileDates(state.profile).slice(-7),seen={};
   dates.forEach(function(dd){var dy=daily(dd.date);if(!dy)return;var loc={};
     (dy.hot_topics_today||[]).forEach(function(ht){loc[ht.title]=true;});
     (dy.items||[]).forEach(function(it){(it.tags||[]).forEach(function(t){loc["#"+t]=true;});});
@@ -632,7 +668,7 @@ function computeTrending(){
 
 function renderMarks(){
   var m=getMarks(),allKeys=Object.keys(m),keys=allKeys.sort(function(a,b){return m[b].ts-m[a].ts});
-  keys=keys.filter(function(k){return applyFilter([m[k]]).length>0;});
+  keys=keys.filter(function(k){return profileForDate(m[k].date)===state.profile&&applyFilter([m[k]]).length>0;});
   if(!keys.length)return '<div class="empty">'+ico('star')+(allKeys.length?T("none"):T("mark_empty"))+'</div>';
   var h='<div class="note tip"><b>'+keys.length+'</b> '+T("mark_tip")+'</div><div class="grid">';
   h+=keys.map(function(k){var it=m[k],di=dimMeta(daily(it.date),it.dim);
@@ -648,14 +684,14 @@ function renderMarks(){
 
 function renderHistory(){
   var h='<div class="note tip">'+T("history_tip")+'</div><div class="histlist">';
-  h+=(MANIFEST.dates||[]).map(function(dd){var cur=dd.date===state.date;
+  h+=profileDates(state.profile).slice().reverse().map(function(dd){var cur=dd.date===state.date;
     return '<div class="hist'+(cur?' cur':'')+'" onclick="switchDate(\''+dd.date+'\')"><div class="hic">'+ico('doc')+'</div>'+
       '<div><div class="hd">'+esc(dd.label)+'</div><div class="hc">'+esc(dd.date)+' · '+(dd.count||"-")+' '+T("intel")+'</div></div>'+
       '<div class="go">'+(cur?T("current"):T("switch"))+'</div></div>';
   }).join("")+'</div>';
   return h;
 }
-function switchDate(date){loadDigest(date,function(){state.date=date;state.view="overview";state.type="all";window.scrollTo(0,0);render();});}
+function switchDate(date){loadDigest(date,function(){state.date=date;state.profile=profileForDate(date);state.view="overview";state.type="all";localStorage.setItem(PROFILE_KEY,state.profile);window.scrollTo(0,0);render();});}
 function langKey(date){return date+"#en";}
 function loadBaseDigest(date,cb){
   var db=window.__DAILY__||{};
@@ -794,6 +830,7 @@ function renderAbout(){
   '<div class="note tip">本页是工作台的使用说明 + 设计文档。完整方法论见 <code>docs/调研方法论与Loop设计.md</code>。</div>'+
   '<h3>'+ico('target')+'这是什么</h3>'+
   '<p><b>'+T("profile")+'：</b>'+esc(profile)+'。当前主题为 '+esc(dimNames)+'。工作台按 profile 选择公开来源，保留原文、日期、判断依据和下一步实验，并支持标记、检索、历史回看与跨天热点追踪。</p>'+
+  (profile==="general-ai"?'<div class="note tip">'+T("finance_explain")+'</div>':'')+
   '<h3>'+ico('refresh')+'调研 Loop（Loop Engineering 设计）</h3>'+
   '<p>核心是一个<b>每天自动跑一圈、且能自我优化</b>的闭环。六个阶段：</p>'+
   '<div class="loop">'+
@@ -843,7 +880,7 @@ function layer(icn,t,d){return '<div class="layer"><div class="lic">'+ico(icn)+'
 function row(a,b){return '<tr><td><code>'+a+'</code></td><td>'+b+'</td></tr>';}
 
 /* ---------- 启动 ---------- */
-(function(){if(!state.date&&MANIFEST.dates&&MANIFEST.dates.length)state.date=MANIFEST.dates[0].date;loadDigest(state.date,render);})();
+(function(){if(!state.date&&MANIFEST.dates&&MANIFEST.dates.length)state.date=MANIFEST.dates[MANIFEST.dates.length-1].date;loadDigest(state.date,function(){state.profile=(daily()&&daily().profile)||profileForDate(state.date);localStorage.setItem(PROFILE_KEY,state.profile);render();});})();
 </script>
 </body>
 </html>

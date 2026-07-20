@@ -96,6 +96,10 @@ python3 scripts/run_daily.py --date today --profile viggle-graphics
 
 Profile 解析顺序为：CLI `--profile` → `config/runtime.yaml` 的 `active_profile` → `general-ai` 兼容默认。v1 每次只运行一个 profile。
 
+网页顶部可在“图形学”和“原版 AI＋金融”之间切换。切换后会打开该 profile 的最新 digest，并将历史归档、近期高频和收藏范围限定到当前 profile。`data/manifest.js` 的每个日期记录都带有 `profile`；没有该字段的旧记录自动按 `general-ai` 读取。
+
+原版的“AI × 金融”并不是普通荐股栏目。它关注 AI 如何进入投研、量化、交易、支付、风控和监管，也观察芯片、算力与 AI 产品变化如何传导到上市公司和市场。默认保留原作者的栏目和来源结构，内容只用于技术与产业情报，不构成投资建议。
+
 `viggle-graphics` 使用五个主题维度：`video`、`graphics`、`systems`、`eval`、`ecosystem`。论文不是单独维度，而是可跨主题筛选的 `content_type: paper`；看板可切换 All、Papers、Technical Reports、Repos/Models、News 和 KOL。
 
 论文雷达按节奏分层：每日扫描 arXiv `cs.CV/cs.GR/cs.LG`、官方研究页、项目页和 Hugging Face；每周或会期关注 CVPR、ICCV、ECCV、SIGGRAPH、SIGGRAPH Asia、TOG、ICLR、NeurIPS、ICML、MLSys、OSDI、NSDI、SOSP、ACM MM；每月或关键词触发时追踪 TPAMI、IJCV、TVCG、TMM、Computer Graphics Forum。TVCG 重点看 VR/AR、交互式 3D、Scientific Visualization 和可视化系统。

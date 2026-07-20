@@ -122,12 +122,12 @@ def write_digest_from_json(date_value, json_path, language_override=None, profil
         "",
     ]
     write_text(out, "\n".join(text))
-    update_manifest(date_iso, len(payload.get("items", [])))
+    update_manifest(date_iso, len(payload.get("items", [])), profile["id"])
     print("[run] 已写入", out)
     return out
 
 
-def update_manifest(date_value, count):
+def update_manifest(date_value, count, profile_id="general-ai"):
     date_iso = normalize_date(date_value)
     key = slash_date(date_iso)
     manifest = ROOT / "data" / "manifest.js"
@@ -136,15 +136,21 @@ def update_manifest(date_value, count):
     entries = []
     if manifest.exists():
         raw = read_text(manifest)
-        for m in __import__("re").finditer(
-            r'\{\s*date:\s*"([^"]+)",\s*label:\s*"([^"]+)",\s*count:\s*(\d+),\s*file:\s*"([^"]+)"\s*\}',
-            raw,
-        ):
+        for m in __import__("re").finditer(r'\{([^{}]+)\}', raw):
+            block = m.group(1)
+            date_match = __import__("re").search(r'date:\s*"([^"]+)"', block)
+            label_match = __import__("re").search(r'label:\s*"([^"]+)"', block)
+            count_match = __import__("re").search(r'count:\s*(\d+)', block)
+            file_match = __import__("re").search(r'file:\s*"([^"]+)"', block)
+            if not all((date_match, label_match, count_match, file_match)):
+                continue
+            profile_match = __import__("re").search(r'profile:\s*"([^"]+)"', block)
             entries.append({
-                "date": m.group(1),
-                "label": m.group(2),
-                "count": int(m.group(3)),
-                "file": m.group(4),
+                "date": date_match.group(1),
+                "label": label_match.group(1),
+                "count": int(count_match.group(1)),
+                "file": file_match.group(1),
+                "profile": profile_match.group(1) if profile_match else "general-ai",
             })
     entries = [e for e in entries if e["date"] != key]
     entries.append({
@@ -152,12 +158,13 @@ def update_manifest(date_value, count):
         "label": date_label(date_iso),
         "count": int(count),
         "file": "data/%s/digest.js" % key,
+        "profile": profile_id,
     })
     entries.sort(key=lambda e: e["date"])
     latest = entries[-1]["date"]
     body = ",\n".join(
-        '    { date: "%s", label: "%s", count: %d, file: "%s" }' %
-        (e["date"], e["label"], e["count"], e["file"])
+        '    { date: "%s", label: "%s", count: %d, file: "%s", profile: "%s" }' %
+        (e["date"], e["label"], e["count"], e["file"], e.get("profile", "general-ai"))
         for e in entries
     )
     write_text(manifest, "\n".join([
@@ -190,7 +197,7 @@ def copy_sample(date_value, sample_date):
     raw = raw.replace('generated_at: "%s"' % normalize_date(sample_date), 'generated_at: "%s"' % date_iso)
     write_text(dst, raw)
     item_count = len(__import__("re").findall(r'\bid\s*:\s*"([^"]+)"', raw))
-    update_manifest(date_iso, item_count)
+    update_manifest(date_iso, item_count, "general-ai")
     print("[run] 已复制样例 %s -> %s" % (old_key, new_key))
 
 
