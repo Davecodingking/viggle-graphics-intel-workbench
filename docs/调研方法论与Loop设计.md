@@ -19,9 +19,9 @@
 
 工作台用 profile 隔离不同研究目标。解析顺序是 CLI `--profile` → `config/runtime.yaml` 的 `active_profile` → `general-ai` 兼容默认；单次命令生成一个 profile，周任务可顺序检查并补齐 `viggle-graphics`、`general-ai`、`investing-markets` 三份简报。
 
-默认 `viggle-graphics` 采用五个主题：视频生成与人物动画、图形学与 3D/4D、推理系统/GPU/Pipeline、评测/数据/安全、开源/产品/产业生态。论文是跨主题 `content_type`：视频论文进入 `video`，渲染或 Gaussian Splatting 论文进入 `graphics`，推理与调度论文进入 `systems`，再由 Papers 筛选聚合查看。
+默认 `viggle-graphics` 采用五个主题：视频生成与人物动画、图形学/3D 重建/世界引擎、推理系统/GPU/Pipeline、评测/数据/安全、开源/产品/产业生态。论文是跨主题 `content_type`：视频论文进入 `video`，重建、渲染、Gaussian Splatting 或交互世界论文进入 `graphics`，推理与调度论文进入 `systems`，再由 Papers 筛选聚合查看。
 
-检索使用“问题 × 方法 × 工程约束”的组合矩阵，例如 human animation / identity / temporal consistency × diffusion / neural rendering / Gaussian Splatting × latency / memory / throughput / stability。论文雷达分为每日 arXiv 与官方项目页、每周/会期顶会与系统会议、每月/关键词触发期刊。TVCG 不是低优先级刊物，但在本 profile 中重点追踪 VR/AR、交互式 3D、Scientific Visualization 与可视化系统，而非无差别全量扫描。
+检索使用“问题 × 方法 × 工程约束”的组合矩阵，例如 human animation / 3D reconstruction / interactive world model × diffusion / geometric foundation model / neural rendering / Gaussian Splatting × latency / memory / geometry consistency / persistence / engine export。`graphics` 下面固定拆成 3D 重建与几何基础模型、动态 4D 场景、可交互世界引擎三条子轨道；世界引擎必须区分纯帧生成、可持久 3D 表示和具有 action/physics/collision 的模拟系统。论文雷达分为每日 arXiv 与官方项目页、每周/会期 3DV/视觉/图形学/机器人与系统会议、每月/关键词触发期刊。TVCG 不是低优先级刊物，但在本 profile 中重点追踪 VR/AR、交互式 3D、Scientific Visualization 与可视化系统，而非无差别全量扫描。
 
 `general-ai` 完整保留原作者配置与以下五维调研范式：
 

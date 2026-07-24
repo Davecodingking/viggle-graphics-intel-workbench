@@ -4,7 +4,7 @@
 
 AI Intel Workbench is a **local-first, open-source daily intelligence workflow for agents**. It helps Codex, Claude Code, or any skill-capable agent collect and structure daily AI + user-defined industry signals, then review them in a visual local dashboard.
 
-The default `viggle-graphics` profile targets video generation, human animation, graphics/3D/4D, inference systems and GPU pipelines, evaluation/safety, and the surrounding ecosystem. The author's original workflow and source files remain intact as the `general-ai` profile. A third `investing-markets` profile provides filing-first A-share, Hong Kong and U.S. equity research without trade execution.
+The default `viggle-graphics` profile targets video generation, human animation, 3D reconstruction, world engines, graphics/3D/4D, inference systems and GPU pipelines, evaluation/safety, and the surrounding ecosystem. Its graphics track covers SfM/MVS/SLAM, feed-forward geometric foundation models, static and dynamic reconstruction, and persistent, navigable, editable, interactive worlds with renderer or physics-engine integration. The author's original workflow and source files remain intact as the `general-ai` profile. A third `investing-markets` profile provides filing-first A-share, Hong Kong and U.S. equity research without trade execution.
 
 Use it to track AI lab updates, X-first KOL opinions, frontier papers, open-source projects, and AI x finance / crypto / any configured industry. It includes configurable sources, a 59-person default KOL seed list, a research radar for researcher longform and lab papers, industry anchors, structured digests, output-language selection, a zero-dependency HTML workbench, optional Lark/Feishu bot pushes, and local scheduled runs.
 

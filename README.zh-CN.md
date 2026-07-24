@@ -4,7 +4,7 @@
 
 本项目是一个**本地优先、可开源安装部署**的每日 AI 行业情报工作台。它把配置化信源、X-first KOL 追踪、行业锚定、Agent 调研、结构化 digest、本地 HTML 工作台、机器人推送和本地定时任务串成一套可复用流程。
 
-当前默认启用 `viggle-graphics` profile，面向视频生成、人物动画、图形学与 3D/4D、推理系统/GPU Pipeline、评测安全和产业生态。原作者的泛 AI 工作流完整保留为 `general-ai`，原有 sources、keywords、KOL 和 radar 配置不删不改。另有独立的 `investing-markets`，覆盖 A 股、港股和美股的公告优先型投资研究。
+当前默认启用 `viggle-graphics` profile，面向视频生成、人物动画、3D 重建、世界引擎、图形学与 3D/4D、推理系统/GPU Pipeline、评测安全和产业生态。`graphics` 维度进一步覆盖 SfM/MVS/SLAM、前馈几何基础模型、静态/动态场景重建，以及可持久、可导航、可编辑、可交互并可接渲染或物理引擎的世界模型。原作者的泛 AI 工作流完整保留为 `general-ai`，原有 sources、keywords、KOL 和 radar 配置不删不改。另有独立的 `investing-markets`，覆盖 A 股、港股和美股的公告优先型投资研究。
 
 只要你的 Agent 具备读取 skill/说明文档、运行本地脚本、设置或触发定时任务的能力，就可以使用这个仓库完成初始化、每日调研、看板更新和可选机器人推送。
 

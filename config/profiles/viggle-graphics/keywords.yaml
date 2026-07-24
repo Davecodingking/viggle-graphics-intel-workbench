@@ -16,6 +16,28 @@ query_matrix:
     - animatable avatar
     - dynamic novel view synthesis
     - inverse rendering
+    - 3D reconstruction
+    - scene reconstruction
+    - sparse-view reconstruction
+    - monocular 3D reconstruction
+    - video-to-3D reconstruction
+    - dynamic scene reconstruction
+    - 4D scene reconstruction
+    - camera pose estimation
+    - structure from motion
+    - multi-view stereo
+    - visual SLAM
+    - large-scale scene reconstruction
+    - feed-forward 3D geometry
+    - 3D geometric foundation model
+    - spatial intelligence
+    - generative 3D world
+    - interactive world model
+    - action-conditioned world model
+    - persistent world model
+    - world simulator
+    - simulation-ready 3D scene
+    - editable 3D world
     - video generation evaluation
   methods:
     - video diffusion transformer
@@ -26,6 +48,18 @@ query_matrix:
     - 3D Gaussian Splatting
     - dynamic Gaussian Splatting
     - 4D representation
+    - NeRF
+    - signed distance field
+    - neural surface reconstruction
+    - pointmap
+    - depth and normal prediction
+    - feed-forward reconstruction
+    - 3D scene generation
+    - video world model
+    - neural simulator
+    - object-centric scene graph
+    - collision mesh
+    - physics-aware generation
     - neural avatar
     - sequence parallelism
     - quantization
@@ -37,6 +71,19 @@ query_matrix:
     - memory efficient
     - high resolution
     - long duration
+    - sparse view
+    - pose free
+    - online incremental
+    - large scale
+    - unbounded scene
+    - geometry consistent
+    - persistent state
+    - camera controllable
+    - editable
+    - navigable
+    - interactive
+    - physics compatible
+    - engine export
     - production
     - GPU scheduling
     - fault tolerance
@@ -48,6 +95,12 @@ must_run_queries:
   - 'site:arxiv.org ("human animation" OR "motion transfer") (video OR diffusion)'
   - 'site:arxiv.org ("identity preservation" OR "temporal consistency") "video generation"'
   - 'site:arxiv.org ("Gaussian Splatting" OR "neural rendering") (dynamic OR human OR avatar)'
+  - 'site:arxiv.org ("3D reconstruction" OR "scene reconstruction") ("feed-forward" OR video OR "sparse-view" OR dynamic)'
+  - 'site:arxiv.org ("structure from motion" OR "multi-view stereo" OR SLAM OR "camera pose") ("foundation model" OR transformer OR "real-time")'
+  - 'site:arxiv.org ("dynamic scene reconstruction" OR "4D reconstruction") (video OR human OR interaction)'
+  - 'site:arxiv.org ("interactive world model" OR "generative 3D world" OR "world simulator") (action-conditioned OR persistent OR navigable OR editable)'
+  - 'site:arxiv.org ("world model" OR "world engine") ("3D representation" OR reconstruction OR "Gaussian Splatting" OR physics)'
+  - '(site:worldlabs.ai OR site:deepmind.google OR site:research.nvidia.com) ("world model" OR "spatial intelligence" OR "3D world")'
   - 'site:mlsys.org (diffusion OR video OR visual) (serving OR GPU OR inference)'
   - '("video generation" OR diffusion) (serving OR streaming OR scheduling OR batching) GPU'
 
@@ -58,6 +111,12 @@ topic_tags:
   - { tag: 可控视频, match: [controllable video, trajectory, camera control, motion control] }
   - { tag: Neural Rendering, match: [neural rendering, novel view synthesis, inverse rendering] }
   - { tag: 3DGS, match: [Gaussian Splatting, 3DGS, dynamic Gaussian] }
+  - { tag: 3D重建, match: [3D reconstruction, scene reconstruction, sparse-view reconstruction, video-to-3D] }
+  - { tag: 几何基础模型, match: [geometric foundation model, feed-forward reconstruction, pointmap, camera pose, depth estimation] }
+  - { tag: SfM与SLAM, match: [structure from motion, multi-view stereo, visual SLAM, camera calibration] }
+  - { tag: 动态4D重建, match: [dynamic scene reconstruction, 4D reconstruction, dynamic world, scene flow] }
+  - { tag: 世界引擎, match: [world engine, world model, world simulator, generative 3D world, spatial intelligence] }
+  - { tag: 可交互世界, match: [action-conditioned, interactive world, editable world, navigable world, persistent world, collision mesh, physics engine] }
   - { tag: Avatar, match: [avatar, talking head, human reconstruction, 4D human] }
   - { tag: 推理加速, match: [inference acceleration, distillation, few-step, quantization] }
   - { tag: GPU系统, match: [GPU scheduling, CUDA, Triton, sequence parallel, offload] }

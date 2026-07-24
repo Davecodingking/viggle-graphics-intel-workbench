@@ -4,13 +4,15 @@ meta:
 
 cadence:
   daily:
-    - arXiv cs.CV / cs.GR / cs.LG keyword matrix
+    - arXiv cs.CV / cs.GR / cs.LG / cs.RO keyword matrix
     - Hugging Face Papers and official project pages
     - Official lab research and engineering releases
+    - 3D reconstruction and world-engine focused queries
   weekly_or_venue_release:
-    - CVPR / ICCV / ECCV
+    - 3DV / CVPR / ICCV / ECCV
     - SIGGRAPH / SIGGRAPH Asia / ACM TOG
     - ICLR / NeurIPS / ICML / ACM Multimedia
+    - CoRL / RSS / ICRA for embodied world models and simulation
     - MLSys / OSDI / NSDI / SOSP / EuroSys / USENIX ATC / FAST
   monthly_or_keyword_triggered:
     - IEEE TPAMI / IJCV
@@ -24,6 +26,27 @@ selection_policy:
     - at least one video or human-animation paper
     - at least one graphics or 3D/4D paper
     - at least one ML-systems or GPU paper
+  priority_graphics_coverage:
+    - include at least one 3D reconstruction or geometric-foundation-model item when a primary-source update exists
+    - include at least one world-engine or interactive-world-model item when a primary-source update exists
+    - if no qualifying update exists, say so in graphics notes instead of filling the digest with a weak item
+  graphics_subtracks:
+    reconstruction:
+      - static and dynamic scene reconstruction
+      - SfM / MVS / SLAM / camera pose / depth and normals
+      - feed-forward 3D geometric foundation models
+      - NeRF / 3DGS / meshes / SDF / hybrid representations
+    world_engine:
+      - persistent and navigable 3D worlds
+      - action-conditioned state transitions
+      - editability, object decomposition and scene composition
+      - collision, physics and renderer or game-engine export
+      - long-horizon spatial and temporal consistency
+    bridge_to_viggle:
+      - reconstructing people and environments from video
+      - placing animated characters into consistent 3D worlds
+      - camera-controllable video grounded by 3D geometry
+      - real-time world rendering, streaming and asset pipelines
   relevance:
     direct: 可直接影响人物视频生成、动作迁移、身份或时序质量
     transferable: 方法可迁移到 Viggle 的模型或图形 Pipeline
@@ -37,6 +60,8 @@ paper_requirements:
   - primary URL 与发布日期
   - 方法与相对 baseline 的真实新增点
   - 数据集、硬件、分辨率、帧数和延迟口径
+  - 3D/世界引擎条目的输入模态、相机假设、输出表示、几何与时序指标
+  - 是否具有持久状态、可导航/可编辑能力、action conditioning、collision/physics 与引擎导出
   - limitations 与精选 demo 风险
   - 对 Viggle 的相关性
   - 可在固定样本和固定硬件上执行的最小验证实验

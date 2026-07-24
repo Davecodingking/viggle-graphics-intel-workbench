@@ -46,6 +46,28 @@ class ProfileTests(unittest.TestCase):
         self.assertEqual([dim["key"] for dim in dimensions], ["video", "graphics", "systems", "eval", "ecosystem"])
         self.assertTrue(all(dim.get("en") and dim.get("icon") and dim.get("color") and dim.get("notes") for dim in dimensions))
 
+    def test_viggle_radar_covers_3d_reconstruction_and_world_engines(self):
+        profile = load_profile("viggle-graphics")
+        graphics = next(dim for dim in profile["dimensions"] if dim["key"] == "graphics")
+        self.assertIn("3D 重建", graphics["cn"])
+        self.assertIn("世界引擎", graphics["cn"])
+
+        config_text = "\n".join(
+            path.read_text(encoding="utf-8")
+            for key, path in profile["_config_paths"].items()
+            if key in {"keywords", "radar", "sources"}
+        )
+        for required in (
+            "3D reconstruction",
+            "structure from motion",
+            "dynamic scene reconstruction",
+            "interactive world model",
+            "action-conditioned",
+            "International Conference on 3D Vision",
+            "World Labs Research",
+        ):
+            self.assertIn(required, config_text)
+
     def test_manifest_writer_adds_profile_and_preserves_legacy_entries(self):
         original_root = run_daily.ROOT
         try:
